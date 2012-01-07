@@ -53,8 +53,14 @@
 #define FONT_NUM 19
 
 
-HTMLBuilder::HTMLBuilder() {
+extern QUrl skinDir;
+
+
+HTMLBuilder::HTMLBuilder(Elise* view) {
+//HTMLBuilder::HTMLBuilder() {
     startedTime = time(NULL);
+    parentView = view;
+    //webView = view->getWebView();
 }
 
 HTMLBuilder::~HTMLBuilder() {
@@ -387,14 +393,33 @@ time_t HTMLBuilder::getStartedTime() {
 
 void HTMLBuilder::initDoc() {
 	document = TemplateMap::templateMap["<!--HTMLStart-->"];
+
+	//page.mainFrame()->setHtml(TemplateMap::templateMap["<!--HTMLStart-->"], skinDir);
 }
 
 QString HTMLBuilder::getDoc() {
 	return document;
 }
+/*
+QWebElement HTMLBuilder::getElem() {
+	return page.mainFrame()->documentElement().document();
+}*/
 
 void HTMLBuilder::addToDoc(QString text, QString name) {
 	QString templ = TemplateMap::templateMap["<!--MessageIn-->"];
 	templ.replace("%name%", name);
 	document += templ.replace("%text%", text);
+	//parentView->addToDoc(templ.replace("%text%", text));
+	//webView->page()->mainFrame()->documentElement().appendInside("ץוץוי!");
+
+	//QWebPage tmpPage;
+	//tmpPage.mainFrame()->setHtml(templ, skinDir);
+	//webView->page()->mainFrame()->documentElement().appendInside(page.mainFrame()->documentElement().document());
+
+	//page.mainFrame()->documentElement().appendInside(tmpPage.mainFrame()->documentElement().document());
+}
+
+void HTMLBuilder::saveDoc(QString doc) {
+	document = doc;
+	//page.mainFrame()->documentElement().replace(elem);
 }

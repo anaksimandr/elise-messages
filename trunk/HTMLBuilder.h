@@ -5,10 +5,11 @@ class HTMLBuilder;
 #define HTMLBUILDER_H
 
 #include <QString>
+//#include <QtWebKit>
 #include "time.h"
 #include "main.h"
 #include "m_ieview.h"
-//#include "Elise.h"
+#include "Elise.h"
 #include "utils.h"
 #include "m_contacts.h"
 #include "template.h"
@@ -29,7 +30,10 @@ private:
         ENF_ALL = 255,
         ENF_CHAT_FORMATTING = 256
     };*/
+    Elise* parentView;
+    //QWebView* webView;
     QString document;
+    //QWebPage page;
 
 	IEVIEWEVENT lastIEViewEvent;
 	time_t startedTime;
@@ -43,11 +47,14 @@ private:
 	wchar_t* getContactName(HANDLE hContact, const char* szProto);
 	void addToDoc(QString text, QString name);
 public:
-    HTMLBuilder();
+    HTMLBuilder(Elise* view);
+    //HTMLBuilder();
     ~HTMLBuilder();
 
     void initDoc();
     QString getDoc();
+    //QWebElement getElem();
+    void saveDoc(QString doc);
 	void appendEventOld(Elise*, IEVIEWEVENT* event);
 	void appendEventNew(Elise* view, IEVIEWEVENT* event);
 	void appendEvent(Elise*, IEVIEWEVENT* event);

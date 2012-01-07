@@ -10,6 +10,8 @@ Elise Messages Plugin for Miranda IM
 #include "services.h"
 #include <QLineEdit>
 
+#include <QMessageBox>
+
 Elise* Elise::list = NULL;
 CRITICAL_SECTION Elise::mutex;
 bool Elise::isInited = false;
@@ -32,10 +34,11 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
     height = cy;
     width = cx;
 
+    builder = new HTMLBuilder(this);
     mainWnd = new QWinWidget(parent);
     webView = new QWebView(mainWnd);
 
-    builder.initDoc();
+    builder->initDoc();
 
     // пущай пока висит, авось пригодится
     //webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -44,9 +47,9 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 
     hwnd = mainWnd->winId();
 
-    webView->setHtml(builder.getDoc(), skinDir);
+    webView->setHtml(builder->getDoc(), skinDir);
     //webView->settings()->JavaEnabled = QWebSettings::JavascriptEnabled;
-    webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+    //webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 
     mainWnd->show();
 
@@ -73,6 +76,7 @@ Elise::~Elise() {
 	next = NULL;
 	LeaveCriticalSection(&mutex);
 
+	builder->~HTMLBuilder();
 	webView->~QWebView();
 	mainWnd->~QWinWidget();
 }
@@ -94,6 +98,10 @@ Elise* Elise::get(HWND hwnd) {
     return ptr;
 }
 
+QWebView* Elise::getWebView() {
+    return webView;
+}
+
 void Elise::setWindowPos(int x, int y, int cx, int cy) {
     //rcClient.left = x;
     //rcClient.top = y;
@@ -113,18 +121,61 @@ void Elise::scrollToBottom() {
 
 void Elise::appendEvent(IEVIEWEVENT* event) {
     if (event->eventData == NULL) {return; }
-    builder.appendEventNew(this, event);
 
-    webView->setHtml(builder.getDoc(), skinDir);
+    QString tmp = builder->getDoc();
+    if (!tmp.isEmpty() && !tmp.isNull()) {
+        builder->saveDoc(webView->page()->mainFrame()->toHtml());
+    }
+
+    builder->appendEventNew(this, event);
+
+    webView->setHtml(builder->getDoc(), skinDir);
+
+    //builder->saveDoc(webView->page()->mainFrame()->toHtml());
+
+	//QMessageBox msgBox;
+	//msgBox.setText(builder->getDoc());
+	//msgBox.exec();
+
     //webView->reload();
+    //webView->page()->mainFrame()->documentElement().appendInside(builder->addToDoc());
+    ///*webView->page()->mainFrame()->documentElement().replace(builder->getElem());
 }
 
 void Elise::appendEventOld(IEVIEWEVENT* event) {
-    builder.appendEventOld(this, event);
 
-    webView->setHtml(builder.getDoc(), skinDir);
+    QString tmp = builder->getDoc();
+    if (!tmp.isEmpty() && !tmp.isNull()) {
+        builder->saveDoc(webView->page()->mainFrame()->toHtml());
+    }
+
+    builder->appendEventOld(this, event);
+
+    webView->setHtml(builder->getDoc(), skinDir);
+
+    //builder->saveDoc(webView->page()->mainFrame()->toHtml());
+
+	//QMessageBox msgBox;
+	//msgBox.setText(builder->getDoc());
+	//msgBox.exec();
+
     //webView->reload();
+    //webView->page()->mainFrame()->documentElement().appendInside(builder->addToDoc());
+    ///*webView->page()->mainFrame()->documentElement().replace(builder->getElem());
 }
+/*
+void Elise::addToDoc(QString add) {
+
+	//QMessageBox msgBox;
+	//msgBox.setText(add);
+	//msgBox.exec();
+
+	QWebPage page;
+	page.mainFrame()->setHtml(add, skinDir);
+
+	webView->page()->mainFrame()->documentElement().appendInside(page.mainFrame()->documentElement().document());
+	//webView->page()->mainFrame()->documentElement().evaluateJavaScript(add);
+}*/
 
 void Elise::clear(IEVIEWEVENT* event) {
 
@@ -135,7 +186,8 @@ int Elise::getSelection(IEVIEWEVENT* event) {
 }
 
 void Elise::saveDocument() {
-
+	// нее, тут совсем не это должно быть
+	//builder->saveDoc(webView->page()->mainFrame()->toHtml());
 }
 
 int Elise::InitEliseMessages(void)

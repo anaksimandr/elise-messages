@@ -22,37 +22,39 @@ class Elise;
 
 class Elise {
 private:
-        static Elise* list;
-        static CRITICAL_SECTION mutex;
-        //static HWND hElise;
-        static bool isInited;
-        HWND		hwnd;
-        HWND 		parent;
-        Elise		*prev, *next;
-        //RECT		rcClient;
-        int         height;
-        int         width;
-        QWinWidget*      mainWnd;
-        QWebView*        webView;
-        HTMLBuilder      builder;
+    static Elise* list;
+    static CRITICAL_SECTION mutex;
+    //static HWND hElise;
+    static bool isInited;
+    HWND		hwnd;
+    HWND 		parent;
+    Elise		*prev, *next;
+    //RECT		rcClient;
+    int         height;
+    int         width;
+    QWinWidget*      mainWnd;
+    QWebView*        webView;
+    HTMLBuilder*     builder;
 protected:
-        //void			navigate(const char *);
-        //void			navigate(const wchar_t *);
+    //void			navigate(const char *);
+    //void			navigate(const wchar_t *);
 public:
-        Elise(HWND parent, int x, int y, int cx, int cy);
-        ~Elise();
-        HWND			getHWND();
-        static Elise* 	get(HWND);
-        void            setWindowPos(int x, int y, int cx, int cy);
-        void            scrollToBottom();
-        void            appendEvent(IEVIEWEVENT * event);
-        void            appendEventOld(IEVIEWEVENT * event);
-        void            clear(IEVIEWEVENT * event);
-        int             getSelection(IEVIEWEVENT * event);
-        void            saveDocument();
+    Elise(HWND parent, int x, int y, int cx, int cy);
+    ~Elise();
+    HWND			getHWND();
+    static Elise* 	get(HWND);
+    QWebView*       getWebView();
+    void            setWindowPos(int x, int y, int cx, int cy);
+    void            scrollToBottom();
+    void            appendEvent(IEVIEWEVENT * event);
+    void            appendEventOld(IEVIEWEVENT * event);
+    void            clear(IEVIEWEVENT * event);
+    int             getSelection(IEVIEWEVENT * event);
+    //void            addToDoc(QString add);
+    void            saveDocument();
 
-        static int      InitEliseMessages(void);
-        static void     ReleaseEliseMessages(void);
+    static int      InitEliseMessages(void);
+    static void     ReleaseEliseMessages(void);
 };
 
 
