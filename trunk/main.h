@@ -24,6 +24,7 @@
 #include <m_message.h>
 #include <m_protocols.h>
 #include "m_metacontacts.h"
+#include <m_avatars.h>
 
 extern HINSTANCE hEliseInst;
 

@@ -8,9 +8,8 @@ Elise Messages Plugin for Miranda IM
 #include "utils.h"
 #include "options.h"
 #include "services.h"
-#include <QLineEdit>
 
-#include <QMessageBox>
+//#include <QMessageBox>
 
 Elise* Elise::list = NULL;
 CRITICAL_SECTION Elise::mutex;
@@ -27,12 +26,8 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
     prev = next = NULL;
     hwnd = NULL;
 
-    //rcClient.left = x;
-    //rcClient.top = y;
-    //rcClient.right = x + cx;
-    //rcClient.bottom = y + cy;
     height = cy;
-    width = cx;
+    width = cx;    
 
     builder = new HTMLBuilder(this);
     mainWnd = new QWinWidget(parent);
@@ -46,6 +41,10 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
     //                 Qt::DirectConnection);
 
     hwnd = mainWnd->winId();
+
+    webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
+    webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
+    webView->settings()->setMaximumPagesInCache(0);
 
     webView->setHtml(builder->getDoc(), skinDir);
     //webView->settings()->JavaEnabled = QWebSettings::JavascriptEnabled;
@@ -102,11 +101,7 @@ QWebView* Elise::getWebView() {
     return webView;
 }
 
-void Elise::setWindowPos(int x, int y, int cx, int cy) {
-    //rcClient.left = x;
-    //rcClient.top = y;
-    //rcClient.right = cx;
-    //rcClient.bottom = cy;
+void Elise::setWindowPos(int x, int y, int cx, int cy) {    
 
     height = cy;
     width = cx;
@@ -121,73 +116,28 @@ void Elise::scrollToBottom() {
 
 void Elise::appendEvent(IEVIEWEVENT* event) {
     if (event->eventData == NULL) {return; }
-
-    QString tmp = builder->getDoc();
-    if (!tmp.isEmpty() && !tmp.isNull()) {
-        builder->saveDoc(webView->page()->mainFrame()->toHtml());
-    }
-
     builder->appendEventNew(this, event);
-
     webView->setHtml(builder->getDoc(), skinDir);
-
-    //builder->saveDoc(webView->page()->mainFrame()->toHtml());
-
-	//QMessageBox msgBox;
-	//msgBox.setText(builder->getDoc());
-	//msgBox.exec();
-
-    //webView->reload();
-    //webView->page()->mainFrame()->documentElement().appendInside(builder->addToDoc());
-    ///*webView->page()->mainFrame()->documentElement().replace(builder->getElem());
 }
 
 void Elise::appendEventOld(IEVIEWEVENT* event) {
-
-    QString tmp = builder->getDoc();
-    if (!tmp.isEmpty() && !tmp.isNull()) {
-        builder->saveDoc(webView->page()->mainFrame()->toHtml());
-    }
-
     builder->appendEventOld(this, event);
-
-    webView->setHtml(builder->getDoc(), skinDir);
-
-    //builder->saveDoc(webView->page()->mainFrame()->toHtml());
-
-	//QMessageBox msgBox;
-	//msgBox.setText(builder->getDoc());
-	//msgBox.exec();
-
-    //webView->reload();
-    //webView->page()->mainFrame()->documentElement().appendInside(builder->addToDoc());
-    ///*webView->page()->mainFrame()->documentElement().replace(builder->getElem());
+    webView->setHtml(builder->getDoc(), skinDir);    
 }
-/*
-void Elise::addToDoc(QString add) {
-
-	//QMessageBox msgBox;
-	//msgBox.setText(add);
-	//msgBox.exec();
-
-	QWebPage page;
-	page.mainFrame()->setHtml(add, skinDir);
-
-	webView->page()->mainFrame()->documentElement().appendInside(page.mainFrame()->documentElement().document());
-	//webView->page()->mainFrame()->documentElement().evaluateJavaScript(add);
-}*/
 
 void Elise::clear(IEVIEWEVENT* event) {
-
+    // пока не понял, что тут должно быть =)
+    // наверное очищение окна лога..ЗАВТРОМЭН!
 }
 
 int Elise::getSelection(IEVIEWEVENT* event) {
+    // ЗАВТРОМЭН!
     return 0;
 }
 
 void Elise::saveDocument() {
-	// нее, тут совсем не это должно быть
-	//builder->saveDoc(webView->page()->mainFrame()->toHtml());
+    // TODO: реализация сохранения лога как страницы..
+    // ВСЕ БУДЕТ СДЕЛАНО, НО ЗАВТРО! ЗАВТРОМЭН!
 }
 
 int Elise::InitEliseMessages(void)
@@ -205,11 +155,7 @@ int Elise::InitEliseMessages(void)
 	//utils::createServiceFunction_Ex(MS_IEVIEW_EVENT,(MIRANDASERVICE) HandleIENavigate);
 	//hHookOptionsChanged = CreateHookableEvent(ME_IEVIEW_OPTIONSCHANGED);
 
-	TemplateMap::LoadTemplate(skinPath);
-
-	//QMessageBox msgBox;
-	//msgBox.setText(templateMap["<!--HTMLStart-->"] + templateMap["<!--MessageIn-->"]);
-	//msgBox.exec();
+	TemplateMap::LoadTemplate(skinPath);	
 
 	return 0;
 }

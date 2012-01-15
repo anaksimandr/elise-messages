@@ -1,6 +1,6 @@
 
 
-QT  +=core gui webkit
+QT  += core gui webkit
 
 TARGET  = Elise_Messages_Qt
 

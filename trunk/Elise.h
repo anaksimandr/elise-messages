@@ -20,7 +20,8 @@ class Elise;
 #include "HTMLBuilder.h"
 
 
-class Elise {
+class Elise : public QObject {
+    //Q_OBJECT
 private:
     static Elise* list;
     static CRITICAL_SECTION mutex;
@@ -35,6 +36,7 @@ private:
     QWinWidget*      mainWnd;
     QWebView*        webView;
     HTMLBuilder*     builder;
+    //bool        loading;
 protected:
     //void			navigate(const char *);
     //void			navigate(const wchar_t *);
@@ -55,6 +57,9 @@ public:
 
     static int      InitEliseMessages(void);
     static void     ReleaseEliseMessages(void);
+//public slots:
+    //void            loadStarted();
+    //void            loadFinished();
 };
 
 
