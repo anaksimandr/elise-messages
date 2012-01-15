@@ -20,7 +20,7 @@ struct MM_INTERFACE mmi;
 PLUGININFOEX pluginInfo={
     sizeof(PLUGININFOEX),
     "Elise Messages",
-    PLUGIN_MAKE_VERSION(0,0,0,1),
+    PLUGIN_MAKE_VERSION(0,0,0,2),
     "Alternate chat log.",
     "anaksimandr",
     "s.andreenko@gmail.com",

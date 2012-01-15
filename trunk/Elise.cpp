@@ -35,10 +35,9 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 
     builder->initDoc();
 
-    // пущай пока висит, авось пригодится
-    //webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    //QObject::connect(webView, SIGNAL(linkClicked(QUrl)), qApp, SLOT(linkClicked (QUrl)),
-    //                 Qt::DirectConnection);
+    webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    QObject::connect(webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)),
+                     Qt::DirectConnection);
 
     hwnd = mainWnd->winId();
 
@@ -138,6 +137,10 @@ int Elise::getSelection(IEVIEWEVENT* event) {
 void Elise::saveDocument() {
     // TODO: реализация сохранения лога как страницы..
     // ВСЕ БУДЕТ СДЕЛАНО, НО ЗАВТРО! ЗАВТРОМЭН!
+}
+
+void Elise::linkClicked(QUrl url) {
+     QDesktopServices::openUrl(url);
 }
 
 int Elise::InitEliseMessages(void)

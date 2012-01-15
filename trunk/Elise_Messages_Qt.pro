@@ -7,7 +7,7 @@ TARGET  = Elise_Messages_Qt
 TEMPLATE    = lib
 CONFIG  += shared
 
-VERSION = 0.0.0.1
+VERSION = 0.0.0.2
 DEFINES += UNICODE
 
 SOURCES += \

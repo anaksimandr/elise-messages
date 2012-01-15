@@ -21,7 +21,7 @@ class Elise;
 
 
 class Elise : public QObject {
-    //Q_OBJECT
+    Q_OBJECT
 private:
     static Elise* list;
     static CRITICAL_SECTION mutex;
@@ -60,6 +60,8 @@ public:
 //public slots:
     //void            loadStarted();
     //void            loadFinished();
+private slots:
+    void              linkClicked(QUrl url);
 };
 
 
