@@ -149,7 +149,7 @@ int Elise::InitEliseMessages(void)
 	isInited = true;
 	InitializeCriticalSection(&mutex);
 
-	//Utils::hookEvent_Ex(ME_OPT_INITIALISE, EliseOptInit);
+	Utils::hookEvent_Ex(ME_OPT_INITIALISE, EliseOptInit);
 	//Utils::hookEvent_Ex(ME_SYSTEM_MODULESLOADED, Utils::ModulesLoaded);
 	//Utils::hookEvent_Ex(ME_SYSTEM_PRESHUTDOWN, PreShutdown);
 

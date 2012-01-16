@@ -30,13 +30,15 @@ HEADERS += \
     template.h \
     HTMLBuilder.h
 
-RC_FILES += \
+
+OTHER_FILES += \
     elise_resources.rc
 
 include(F:\Sources\qtwinmigrate\src\qtwinmigrate.pri)
 INCLUDEPATH += \
     F:\Qt\4.8.0\include \
     F:\Sources\Miranda\miranda\include
+
 
 
 

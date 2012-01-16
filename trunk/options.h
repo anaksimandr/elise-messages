@@ -9,8 +9,7 @@ class Options;
 #define OPTIONS_H
 
 #include "main.h"
-
-#define IDC_STATIC 100
+#include "resource.h"
 
 extern int EliseOptInit(WPARAM wParam, LPARAM lParam);
 
