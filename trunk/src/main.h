@@ -4,7 +4,6 @@
 #define MAIN_H
 
 #define _UNICODE
-#define UNICODE
 
 //замена __declspec(dllexport)
 //#define D_SHARED Q_DECL_EXPORT

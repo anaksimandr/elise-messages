@@ -9,7 +9,7 @@ class Options;
 #define OPTIONS_H
 
 #include "main.h"
-#include "resource.h"
+#include "../resource.h"
 
 class Options {
 private:
