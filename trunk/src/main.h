@@ -4,6 +4,7 @@
 #define MAIN_H
 
 #define _UNICODE
+#define UNICODE
 
 //замена __declspec(dllexport)
 //#define D_SHARED Q_DECL_EXPORT
@@ -29,5 +30,7 @@
 #include "m_smileyadd.h"
 
 extern HINSTANCE hEliseInst;
+extern char* eliseModuleName;
+extern HANDLE hHookOptionsChanged;
 
 #endif // MAIN_H

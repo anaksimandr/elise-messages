@@ -170,14 +170,14 @@ int Elise::InitEliseMessages(void)
 	isInited = true;
 	InitializeCriticalSection(&mutex);
 
-	Utils::hookEvent_Ex(ME_OPT_INITIALISE, EliseOptInit);
+	Utils::hookEvent_Ex(ME_OPT_INITIALISE, Options::InitOptions);
 	//Utils::hookEvent_Ex(ME_SYSTEM_MODULESLOADED, Utils::ModulesLoaded);
 	//Utils::hookEvent_Ex(ME_SYSTEM_PRESHUTDOWN, PreShutdown);
 
 	Utils::createServiceFunction_Ex(MS_IEVIEW_WINDOW, (MIRANDASERVICE)HandleEliseWindow);
 	Utils::createServiceFunction_Ex(MS_IEVIEW_EVENT, (MIRANDASERVICE)HandleEliseEvent);
 	//utils::createServiceFunction_Ex(MS_IEVIEW_EVENT,(MIRANDASERVICE) HandleIENavigate);
-	//hHookOptionsChanged = CreateHookableEvent(ME_IEVIEW_OPTIONSCHANGED);
+	hHookOptionsChanged = CreateHookableEvent(ME_IEVIEW_OPTIONSCHANGED);
 
 	TemplateMap::LoadTemplate(skinPath);
 	TemplateMap::LoadBBCodes();

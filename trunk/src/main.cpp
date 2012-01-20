@@ -13,6 +13,7 @@ static const MUUID interfaces[] = {MIID_LOGWINDOW, MIID_LAST};
 
 HINSTANCE hEliseInst;
 PLUGINLINK *pluginLink;
+char* eliseModuleName;
 bool ownApplication = FALSE;
 
 struct MM_INTERFACE mmi;
@@ -20,7 +21,7 @@ struct MM_INTERFACE mmi;
 PLUGININFOEX pluginInfo={
     sizeof(PLUGININFOEX),
     "Elise Messages",
-    PLUGIN_MAKE_VERSION(0,0,0,2),
+    PLUGIN_MAKE_VERSION(0,0,0,3),
     "Alternate chat log.",
     "anaksimandr",
     "s.andreenko@gmail.com",
@@ -54,6 +55,16 @@ extern "C" __declspec(dllexport) const MUUID* MirandaPluginInterfaces(void)
 
 extern "C" int __declspec(dllexport) Load(PLUGINLINK* link)
 {
+    char text[_MAX_PATH];
+    char *p, *q;
+    GetModuleFileNameA(hEliseInst, text, sizeof(text));
+    p = strrchr(text, '\\');
+    p++;
+    q = strrchr(p, '.');
+    *q = '\0';
+    eliseModuleName = _strdup(p);
+    _strupr(eliseModuleName);
+
     pluginLink = link;
     mir_getMMI(&mmi);
 
@@ -64,7 +75,7 @@ extern "C" int __declspec(dllexport) Unload(void)
 {
 	Utils::unhookEvents_Ex();
 	Utils::destroyServices_Ex();
-	//DestroyHookableEvent(hHookOptionsChanged);
+	DestroyHookableEvent(hHookOptionsChanged);
 	Elise::ReleaseEliseMessages();
 
 	if(ownApplication)

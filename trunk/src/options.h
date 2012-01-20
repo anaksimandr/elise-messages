@@ -11,6 +11,19 @@ class Options;
 #include "main.h"
 #include "resource.h"
 
-extern int EliseOptInit(WPARAM wParam, LPARAM lParam);
+class Options {
+private:
+    static int initialized;
+    static int changed;
+
+    static wchar_t* getTemplatePath();
+
+public:
+    static void saveSettings();
+    static int InitOptions(WPARAM wParam, LPARAM lParam);
+    static void MarkInitialized(int i);
+    static void ApplyChanges(int i);
+    static void MarkChanges(int i, HWND hWnd);
+};
 
 #endif // OPTIONS_H

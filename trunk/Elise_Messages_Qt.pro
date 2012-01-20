@@ -7,7 +7,7 @@ TARGET  = Elise_Messages_Qt
 TEMPLATE    = lib
 CONFIG  += shared
 
-VERSION = 0.0.0.2
+VERSION = 0.0.0.3
 DEFINES += UNICODE
 
 SOURCES += \
@@ -23,7 +23,7 @@ HEADERS += \
     src/main.h \
     src/utils.h \
     src/options.h \
-    src/resource.h \
+    resource.h \
     src/services.h \
     src/m_ieview.h \
     src/Elise.h \
