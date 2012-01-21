@@ -16,10 +16,10 @@ class TemplateMap {
 private:
 
 public:
-    static QMap<QString, QString> templateMap;
-    static QMap<QString, QRegExp> templateBBCodes;
-    static void LoadTemplate(const QString &fileName);
-    static void LoadBBCodes();
+	static QMap<QString, QString> templateMap;
+	static QMap<QString, QRegExp> templateBBCodes;
+	static void LoadTemplate(const QString &fileName);
+	static void LoadBBCodes();
 
 };
 

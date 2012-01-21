@@ -12,6 +12,7 @@
 
 //#include <QMfcApp>
 //#include <QWinWidget>
+#include <CommCtrl.h>
 #include <QtCore>
 #include <windows.h>
 #include <tchar.h>

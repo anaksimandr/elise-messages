@@ -167,7 +167,7 @@ typedef struct {
 	HANDLE      hContact;           // contact
 	union {
 		HANDLE 		hDbEventFirst;      // first event to log, when IEE_LOG_EVENTS returns it will contain
-										// the last event actually logged or NULL if no event was logged (IEE_LOG_EVENTS)
+		// the last event actually logged or NULL if no event was logged (IEE_LOG_EVENTS)
 		IEVIEWEVENTDATA *eventData;	    // the pointer to an array of IEVIEWEVENTDATA objects (IEE_LOG_IEV_EVENTS)
 	};
 	int 		count;              // number of events to log

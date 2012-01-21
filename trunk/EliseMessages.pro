@@ -2,7 +2,7 @@
 
 QT  += core gui webkit
 
-TARGET  = Elise_Messages_Qt
+TARGET  = EliseMessages
 
 TEMPLATE    = lib
 CONFIG  += shared

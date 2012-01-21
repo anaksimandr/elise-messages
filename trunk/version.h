@@ -12,12 +12,12 @@
 
 #ifdef _UNICODE
 #if defined(WIN64) || defined(_WIN64)
-	#define __PLUGIN_NAME "Elise Messages (Unicode x64)"
+#define __PLUGIN_NAME "Elise Messages (Unicode x64)"
 #else
-	#define __PLUGIN_NAME "Elise Messages (Unicode)"
+#define __PLUGIN_NAME "Elise Messages (Unicode)"
 #endif
 #else
-	#define __PLUGIN_NAME "Elise Messages"
+#define __PLUGIN_NAME "Elise Messages"
 #endif
 #define __INTERNAL_NAME				"EliseMessages"
 #define __FILENAME					"EliseMessages.dll"

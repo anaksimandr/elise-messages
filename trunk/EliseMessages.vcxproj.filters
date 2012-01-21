@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Generated Files">
@@ -25,9 +25,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{c30b6879-89d0-44d3-b85a-e8357657ca2b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Elise.cpp">
@@ -42,13 +39,13 @@
     <ClCompile Include="src\options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Qt\qtwinmigrate-2.8-opensource\src\qmfcapp.cpp">
+    <ClCompile Include="..\qtwinmigrate\src\qmfcapp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Qt\qtwinmigrate-2.8-opensource\src\qwinhost.cpp">
+    <ClCompile Include="..\qtwinmigrate\src\qwinhost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Qt\qtwinmigrate-2.8-opensource\src\qwinwidget.cpp">
+    <ClCompile Include="..\qtwinmigrate\src\qwinwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\services.cpp">
@@ -68,19 +65,22 @@
     <ClInclude Include="src\HTMLBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\m_ieview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Qt\qtwinmigrate-2.8-opensource\src\qmfcapp.h">
+    <ClInclude Include="..\qtwinmigrate\src\qmfcapp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="..\..\Qt\qtwinmigrate-2.8-opensource\src\qwinhost.h">
+    <CustomBuild Include="..\qtwinmigrate\src\qwinhost.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\Qt\qtwinmigrate-2.8-opensource\src\qwinwidget.h">
+    <CustomBuild Include="..\qtwinmigrate\src\qwinwidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="resource.h">
@@ -93,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -115,24 +118,14 @@
     <ClCompile Include="release\moc_qwinwidget.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <CustomBuild Include="debug\resource.res">
+    <CustomBuild Include="debug\resources.res">
       <Filter>Generated Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="release\resource.res">
+    <CustomBuild Include="release\resources.res">
       <Filter>Generated Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Version.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resource.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="Version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ResourceCompile Include="resources.rc" />
   </ItemGroup>
 </Project>

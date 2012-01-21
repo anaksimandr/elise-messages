@@ -13,17 +13,17 @@ HANDLE* Utils::hServices = NULL;
 
 
 HANDLE Utils::hookEvent_Ex(const char *name, MIRANDAHOOK hook) {
-    hookNum ++;
-    hHooks = (HANDLE *) mir_realloc(hHooks, sizeof(HANDLE) * (hookNum));
-    hHooks[hookNum - 1] = HookEvent(name, hook);
-    return hHooks[hookNum - 1] ;
+	hookNum ++;
+	hHooks = (HANDLE *) mir_realloc(hHooks, sizeof(HANDLE) * (hookNum));
+	hHooks[hookNum - 1] = HookEvent(name, hook);
+	return hHooks[hookNum - 1] ;
 }
 
 HANDLE Utils::createServiceFunction_Ex(const char *name, MIRANDASERVICE service) {
-    serviceNum++;
-    hServices = (HANDLE *) mir_realloc(hServices, sizeof(HANDLE) * (serviceNum));
-    hServices[serviceNum - 1] = CreateServiceFunction(name, service);
-    return hServices[serviceNum - 1] ;
+	serviceNum++;
+	hServices = (HANDLE *) mir_realloc(hServices, sizeof(HANDLE) * (serviceNum));
+	hServices[serviceNum - 1] = CreateServiceFunction(name, service);
+	return hServices[serviceNum - 1] ;
 }
 
 void Utils::unhookEvents_Ex() {

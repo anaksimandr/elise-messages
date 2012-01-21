@@ -22,42 +22,42 @@ QUrl skinDir = QUrl(QDir::currentPath() + "/" + skinPath);
 
 Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 
-    this->parent = parent;
-    prev = next = NULL;
-    hwnd = NULL;
+	this->parent = parent;
+	prev = next = NULL;
+	hwnd = NULL;
 
-    height = cy;
-    width = cx;    
+	height = cy;
+	width = cx;    
 
-    builder = new HTMLBuilder(this);
-    mainWnd = new QWinWidget(parent);
-    webView = new QMyWebView(mainWnd, this);
+	builder = new HTMLBuilder(this);
+	mainWnd = new QWinWidget(parent);
+	webView = new QMyWebView(mainWnd, this);
 
-    builder->initDoc();
+	builder->initDoc();
 
-    webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    QObject::connect(webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)),
-                     Qt::DirectConnection);
+	webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+	QObject::connect(webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)),
+		Qt::DirectConnection);
 
-    hwnd = mainWnd->winId();
+	hwnd = mainWnd->winId();
 
-    webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
-    webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
-    webView->settings()->setMaximumPagesInCache(0);
+	webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
+	webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
+	webView->settings()->setMaximumPagesInCache(0);
 
-    webView->setHtml(builder->getDoc(), skinDir);
-    //webView->settings()->JavaEnabled = QWebSettings::JavascriptEnabled;
-    //webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+	webView->setHtml(builder->getDoc(), skinDir);
+	//webView->settings()->JavaEnabled = QWebSettings::JavascriptEnabled;
+	//webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 
-    mainWnd->show();
+	mainWnd->show();
 
-    EnterCriticalSection(&mutex);
-    next = list;
-    if (next != NULL) {
-        next->prev = this;
-    }
-    list = this;
-    LeaveCriticalSection(&mutex);
+	EnterCriticalSection(&mutex);
+	next = list;
+	if (next != NULL) {
+		next->prev = this;
+	}
+	list = this;
+	LeaveCriticalSection(&mutex);
 }
 
 Elise::~Elise() {
@@ -75,13 +75,13 @@ Elise::~Elise() {
 	LeaveCriticalSection(&mutex);
 
 	builder->~HTMLBuilder();
-        webView->~QMyWebView();
+	webView->~QMyWebView();
 	mainWnd->~QWinWidget();
 }
 
 QMyWebView::QMyWebView(QWidget* parentWidget, Elise* elise) {
-    this->setParent(parentWidget);
-    parent = elise;
+	this->setParent(parentWidget);
+	parent = elise;
 }
 
 QMyWebView::~QMyWebView() {
@@ -89,79 +89,79 @@ QMyWebView::~QMyWebView() {
 }
 
 void QMyWebView::contextMenuEvent(QContextMenuEvent* e) {
-    QMenu* menu = new QMenu(this);
+	QMenu* menu = new QMenu(this);
 
-    QAction* menuAction = new QAction("Show HTML source",this);
-    connect(menuAction,SIGNAL(triggered()),this,SLOT(showText()));
+	QAction* menuAction = new QAction("Show HTML source",this);
+	connect(menuAction,SIGNAL(triggered()),this,SLOT(showText()));
 
-    menu->addAction(menuAction);
-    menu->exec(e->globalPos());
-    delete menuAction;
-    delete menu;
+	menu->addAction(menuAction);
+	menu->exec(e->globalPos());
+	delete menuAction;
+	delete menu;
 }
 
 HWND Elise::getHWND() {
-    return hwnd;
+	return hwnd;
 }
 
 Elise* Elise::get(HWND hwnd) {
-    Elise* ptr;
-    if (list == NULL) return NULL;
-    EnterCriticalSection(&mutex);
-    for (ptr = list; ptr !=NULL; ptr=ptr->next) {
-        if (ptr->hwnd == hwnd) {
-            break;
-        }
-    }
-    LeaveCriticalSection(&mutex);
-    return ptr;
+	Elise* ptr;
+	if (list == NULL) return NULL;
+	EnterCriticalSection(&mutex);
+	for (ptr = list; ptr !=NULL; ptr=ptr->next) {
+		if (ptr->hwnd == hwnd) {
+			break;
+		}
+	}
+	LeaveCriticalSection(&mutex);
+	return ptr;
 }
 
 QString Elise::getHTML() {
-    return builder->getDoc();
+	return builder->getDoc();
 }
 
 void Elise::setWindowPos(int x, int y, int cx, int cy) {    
 
-    height = cy;
-    width = cx;
+	height = cy;
+	width = cx;
 
-    SetWindowPos(hwnd, HWND_TOP, x, y, cx, cy, 0);
-    webView->resize(width, height);
+	SetWindowPos(hwnd, HWND_TOP, x, y, cx, cy, 0);
+	webView->resize(width, height);
 }
 
 void Elise::scrollToBottom() {
-    webView->page()->mainFrame()->scroll(0, webView->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
+	webView->page()->mainFrame()->scroll(0, webView->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
 }
 
 void Elise::appendEvent(IEVIEWEVENT* event) {
-    if (event->eventData == NULL) {return; }
-    builder->appendEventNew(this, event);
-    webView->setHtml(builder->getDoc(), skinDir);
+	if (event->eventData == NULL) {return; }
+	builder->appendEventNew(this, event);
+	webView->setHtml(builder->getDoc(), skinDir);
 }
 
 void Elise::appendEventOld(IEVIEWEVENT* event) {
-    builder->appendEventOld(this, event);
-    webView->setHtml(builder->getDoc(), skinDir);    
+	builder->appendEventOld(this, event);
+	webView->setHtml(builder->getDoc(), skinDir);    
 }
 
 void Elise::clear(IEVIEWEVENT* event) {
-    // ïîêà íå ïîíÿë, ÷òî òóò äîëæíî áûòü =)
-    // íàâåðíîå î÷èùåíèå îêíà ëîãà..ÇÀÂÒÐÎÌÝÍ!
+	// ïîêà íå ïîíÿë, ÷òî òóò äîëæíî áûòü =)
+	// íàâåðíîå î÷èùåíèå îêíà ëîãà..ÇÀÂÒÐÎÌÝÍ!
 }
 
 int Elise::getSelection(IEVIEWEVENT* event) {
-    // ÇÀÂÒÐÎÌÝÍ!
-    return 0;
+	// ÇÀÂÒÐÎÌÝÍ!
+	return 0;
 }
 
 void Elise::saveDocument() {
-    // TODO: ðåàëèçàöèÿ ñîõðàíåíèÿ ëîãà êàê ñòðàíèöû..
-    // ÂÑÅ ÁÓÄÅÒ ÑÄÅËÀÍÎ, ÍÎ ÇÀÂÒÐÎ! ÇÀÂÒÐÎÌÝÍ!
+	// TODO: ðåàëèçàöèÿ ñîõðàíåíèÿ ëîãà êàê ñòðàíèöû..
+	// ÂÑÅ ÁÓÄÅÒ ÑÄÅËÀÍÎ, ÍÎ ÇÀÂÒÐÎ! ÇÀÂÒÐÎÌÝÍ!
 }
 
 void Elise::linkClicked(QUrl url) {
-     QDesktopServices::openUrl(url);
+	QDesktopServices::openUrl(url);
 }
 
 int Elise::InitEliseMessages(void)
@@ -195,12 +195,12 @@ void Elise::ReleaseEliseMessages() {
 }
 
 void QMyWebView::showText() {
-    //QDialog* dlg = new QDialog(this);
-    QTextEdit* view = new QTextEdit();
-    view->resize(500, 500);
-    view->setWindowTitle("HTML code");
-    view->setText(parent->getHTML());
-    view->show();
-    //QProcess* proc=new QProcess(this);
-    //proc->start("explorer D:/file.doc");
+	//QDialog* dlg = new QDialog(this);
+	QTextEdit* view = new QTextEdit();
+	view->resize(500, 500);
+	view->setWindowTitle("HTML code");
+	view->setText(parent->getHTML());
+	view->show();
+	//QProcess* proc=new QProcess(this);
+	//proc->start("explorer D:/file.doc");
 }
