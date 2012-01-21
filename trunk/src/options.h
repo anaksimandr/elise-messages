@@ -15,9 +15,7 @@ class Options {
 private:
 	static int initialized;
 	static int changed;
-
-	static wchar_t* getTemplatePath();
-
+	//static 
 public:
 	static void saveSettings(HWND hwnd);
 	static int InitOptions(WPARAM wParam, LPARAM lParam);
@@ -25,6 +23,7 @@ public:
 	static void ApplyChanges(int i);
 	static void MarkChanges(int i, HWND hWnd);
 	static bool BrowseFile(HWND hwndDlg, wchar_t* filter, wchar_t* defExt,  wchar_t* path, int maxLen);
+	static wchar_t* getTemplatePath();
 };
 
 #endif // OPTIONS_H

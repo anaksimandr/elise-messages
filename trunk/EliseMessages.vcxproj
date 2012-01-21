@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug Unicode|Win32">
+      <Configuration>Debug Unicode</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release Unicode|Win32">
+      <Configuration>Release Unicode</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -16,43 +16,39 @@
     <Keyword>Qt4VSv1.0</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="Configuration">
     <OutputDirectory>debug\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <IntermediateDirectory>debug\</IntermediateDirectory>
-    <PrimaryOutput>EliseMessages</PrimaryOutput>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="Configuration">
     <OutputDirectory>release\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <IntermediateDirectory>release\</IntermediateDirectory>
-    <PrimaryOutput>EliseMessages</PrimaryOutput>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EliseMessages</TargetName>
-    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IgnoreImportLibrary>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EliseMessages</TargetName>
-    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</IgnoreImportLibrary>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">..\Plugins\$(ProjectName)\Debug Unicode\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">debug\</IntDir>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">true</IgnoreImportLibrary>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">..\Plugins\$(ProjectName)\Release Unicode\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">release\</IntDir>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">false</LinkIncremental>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>"..\..\Qt\4.8.0\include\QtCore";"..\..\Qt\4.8.0\include\QtGui";"..\..\Qt\4.8.0\include\QtWebKit";"..\..\Qt\4.8.0\include";"..\qtwinmigrate\src";"..\..\Qt\4.8.0\include";"..\Miranda\miranda\include";"..\..\Qt\4.8.0\include\ActiveQt";"debug";..\..\Qt\4.8.0\mkspecs\default;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
@@ -92,7 +88,7 @@
       <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;QT_LARGEFILE_SUPPORT;UNICODE;QT_DLL;QT_WEBKIT_LIB;QT_GUI_LIB;QT_CORE_LIB;QT_HAVE_MMX;QT_HAVE_3DNOW;QT_HAVE_SSE;QT_HAVE_MMXEXT;QT_HAVE_SSE2;QT_THREAD_SUPPORT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>"..\..\Qt\4.8.0\include\QtCore";"..\..\Qt\4.8.0\include\QtGui";"..\..\Qt\4.8.0\include\QtWebKit";"..\..\Qt\4.8.0\include";"..\qtwinmigrate\src";"..\..\Qt\4.8.0\include";"..\Miranda\miranda\include";"..\..\Qt\4.8.0\include\ActiveQt";"release";..\..\Qt\4.8.0\mkspecs\default;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
@@ -147,14 +143,14 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="src\Elise.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Qt\4.8.0\bin\moc.exe;src\Elise.h;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"debug" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 src\Elise.h -o debug\moc_Elise.cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MOC src\Elise.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\moc_Elise.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Qt\4.8.0\bin\moc.exe;src\Elise.h;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"release" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 src\Elise.h -o release\moc_Elise.cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MOC src\Elise.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\moc_Elise.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe;src\Elise.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"debug" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 src\Elise.h -o debug\moc_Elise.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">MOC src\Elise.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">debug\moc_Elise.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe;src\Elise.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"release" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 src\Elise.h -o release\moc_Elise.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">MOC src\Elise.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">release\moc_Elise.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="src\HTMLBuilder.h" />
     <ClInclude Include="src\m_ieview.h" />
@@ -162,24 +158,24 @@
     <ClInclude Include="src\options.h" />
     <ClInclude Include="..\qtwinmigrate\src\qmfcapp.h" />
     <CustomBuild Include="..\qtwinmigrate\src\qwinhost.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\qtwinmigrate\src\qwinhost.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"debug" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinhost.h -o debug\moc_qwinhost.cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MOC ..\qtwinmigrate\src\qwinhost.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\moc_qwinhost.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\qtwinmigrate\src\qwinhost.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"release" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinhost.h -o release\moc_qwinhost.cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MOC ..\qtwinmigrate\src\qwinhost.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\moc_qwinhost.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">..\qtwinmigrate\src\qwinhost.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"debug" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinhost.h -o debug\moc_qwinhost.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">MOC ..\qtwinmigrate\src\qwinhost.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">debug\moc_qwinhost.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">..\qtwinmigrate\src\qwinhost.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"release" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinhost.h -o release\moc_qwinhost.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">MOC ..\qtwinmigrate\src\qwinhost.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">release\moc_qwinhost.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\qtwinmigrate\src\qwinwidget.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\qtwinmigrate\src\qwinwidget.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"debug" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinwidget.h -o debug\moc_qwinwidget.cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MOC ..\qtwinmigrate\src\qwinwidget.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\moc_qwinwidget.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\qtwinmigrate\src\qwinwidget.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"release" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinwidget.h -o release\moc_qwinwidget.cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MOC ..\qtwinmigrate\src\qwinwidget.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\moc_qwinwidget.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">..\qtwinmigrate\src\qwinwidget.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"debug" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinwidget.h -o debug\moc_qwinwidget.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">MOC ..\qtwinmigrate\src\qwinwidget.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">debug\moc_qwinwidget.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">..\qtwinmigrate\src\qwinwidget.h;F:\Qt\4.8.0\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Qt\4.8.0\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DUNICODE -DQT_DLL -DQT_NO_DEBUG -DQT_WEBKIT_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_HAVE_MMX -DQT_HAVE_3DNOW -DQT_HAVE_SSE -DQT_HAVE_MMXEXT -DQT_HAVE_SSE2 -DQT_THREAD_SUPPORT -I"..\..\Qt\4.8.0\include\QtCore" -I"..\..\Qt\4.8.0\include\QtGui" -I"..\..\Qt\4.8.0\include\QtWebKit" -I"..\..\Qt\4.8.0\include" -I"..\qtwinmigrate\src" -I"..\..\Qt\4.8.0\include" -I"..\Miranda\miranda\include" -I"..\..\Qt\4.8.0\include\ActiveQt" -I"release" -I..\..\Qt\4.8.0\mkspecs\default -D_MSC_VER=1600 -DWIN32 ..\qtwinmigrate\src\qwinwidget.h -o release\moc_qwinwidget.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">MOC ..\qtwinmigrate\src\qwinwidget.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">release\moc_qwinwidget.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\services.h" />
@@ -189,32 +185,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug\moc_Elise.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="release\moc_Elise.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="debug\moc_qwinhost.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="release\moc_qwinhost.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="debug\moc_qwinwidget.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="release\moc_qwinwidget.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <CustomBuild Include="debug\resources.res">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="release\resources.res">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc" />
+    <ResourceCompile Include="Version.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

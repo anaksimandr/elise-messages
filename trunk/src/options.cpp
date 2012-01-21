@@ -35,13 +35,15 @@ void Options::MarkChanges(int i, HWND hWnd) {
 
 INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	wchar_t path[MAX_PATH];
+	wchar_t path[MAX_PATH] = L"";
+	HWND hChild;
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
 			Options::MarkInitialized(1);
 			TranslateDialogDefault(hwndDlg);
-
+			hChild = GetDlgItem(hwndDlg, IDC_TEMPLATE_PATH);
+			SetWindowTextW(hChild, Options::getTemplatePath());
 			return TRUE;
 		}
 		break;
@@ -69,8 +71,8 @@ INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lP
 		break;
 	case WM_DESTROY:
 		break;
-	}
-	DefWindowProc(hwndDlg, msg, wParam, lParam);
+	}	
+	//return DefWindowProc(hwndDlg, msg, wParam, lParam);
 	return FALSE;
 }
 
@@ -86,7 +88,6 @@ bool Options::BrowseFile(HWND hwndDlg, wchar_t* filter, wchar_t* defExt,  wchar_
 	ofn.nMaxFile = maxLen;
 	ofn.nMaxFileTitle = maxLen;
 	ofn.lpstrDefExt = defExt;//"ivt";
-	ofn.lpstrFileTitle = L"test";
 	if(GetOpenFileNameW(&ofn)) {
 		SetWindowTextW(hwndDlg, path);
 		return true;

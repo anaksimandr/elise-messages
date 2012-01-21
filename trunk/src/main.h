@@ -3,7 +3,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define _UNICODE
+//#define _UNICODE
 
 //замена __declspec(dllexport)
 //#define D_SHARED Q_DECL_EXPORT
@@ -12,7 +12,7 @@
 
 //#include <QMfcApp>
 //#include <QWinWidget>
-#include <CommCtrl.h>
+//#include <CommCtrl.h>
 #include <QtCore>
 #include <windows.h>
 #include <tchar.h>
