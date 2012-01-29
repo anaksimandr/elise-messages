@@ -1,6 +1,8 @@
 
 #include "template.h"
 
+class Elise;
+
 QMap<QString, QString> TemplateMap::templateMap;
 QMap<QString, QRegExp> TemplateMap::templateBBCodes;
 
@@ -57,10 +59,11 @@ static const QString templateNames[48] = {
 	"<!--hMessageOutGroupEndRTL-->"
 };
 
-void TemplateMap::LoadTemplate(const QString &fileName) {
+void TemplateMap::loadTemplate(const QString &fileName) {	
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		MessageBox(NULL, _T("Can not open file for reading."),_T("Error"),MB_OK);
+		Elise::setTemplateInit(false);
 		return;
 	}
 
@@ -87,9 +90,11 @@ void TemplateMap::LoadTemplate(const QString &fileName) {
 		tmplBuf += buf;
 	}
 	templateMap[tmplName] = tmplBuf;
+	Elise::setTemplateInit(true);	
 }
 
-void TemplateMap::LoadBBCodes() {
+
+void TemplateMap::loadBBCodes() {
 
 	templateBBCodes["b"] = QRegExp("[[]b[]](.*)[[]/b[]]", Qt::CaseInsensitive);          // bolded text
 	templateBBCodes["s"] = QRegExp("[[]s[]](.*)[[]/s[]]", Qt::CaseInsensitive);          // strikethrough text

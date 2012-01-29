@@ -6,10 +6,12 @@ Elise Messages Plugin for Miranda IM
 #include "options.h"
 
 HANDLE hHookOptionsChanged;
+QUrl Options::qurlSkinPath;
+QString Options::qstrSkinPath;
 
-int Options::initialized = 0;
-int Options::changed = 0;
-
+//int Options::initialized = 0;
+//int Options::changed = 0;
+/*
 void Options::MarkInitialized(int i) {
 	if (initialized == 0) {
 		//Options::resetProtocolSettings();
@@ -31,19 +33,23 @@ void Options::ApplyChanges(int i) {
 void Options::MarkChanges(int i, HWND hWnd) {
 	SendMessage(GetParent(hWnd), PSM_CHANGED, 0, 0);
 	changed |= i;
-}
+}*/
 
 INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	wchar_t path[MAX_PATH] = L"";
+	QString qstrPath;
 	HWND hChild;
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
-			Options::MarkInitialized(1);
+			//Options::MarkInitialized(1);
 			TranslateDialogDefault(hwndDlg);
+			qstrPath = Options::getRealTemplatePath();
+			qstrPath.toWCharArray(path);			
+			CallService(MS_UTILS_PATHTORELATIVEW, (WPARAM)path, (LPARAM)path);
 			hChild = GetDlgItem(hwndDlg, IDC_TEMPLATE_PATH);
-			SetWindowTextW(hChild, Options::getTemplatePath());
+			SetWindowTextW(hChild, path);
 			return TRUE;
 		}
 		break;
@@ -52,8 +58,11 @@ INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lP
 			switch (LOWORD(wParam)) {
 			case IDC_BROWSE_TEMPLATES:
 				if (Options::BrowseFile(hwndDlg, L"Template (*.ivt)\0*.ivt\0All Files\0*.*\0\0", L"ivt", path, sizeof(path))) {
+					//wchar_t path2[MAX_PATH];					
+					CallService(MS_UTILS_PATHTORELATIVEW, (WPARAM)path, (LPARAM)path);							
 					SetDlgItemTextW(hwndDlg, IDC_TEMPLATE_PATH, path);
-					Options::MarkChanges(1, hwndDlg);
+					SendMessage(GetParent(hwndDlg), PSM_CHANGED, 0, 0);
+					//Options::MarkChanges(1, hwndDlg);
 				}
 				break;
 			}			
@@ -64,14 +73,15 @@ INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lP
 			switch (((LPNMHDR) lParam)->code) {
 			case PSN_APPLY:
 				Options::saveSettings(hwndDlg);
-				Options::ApplyChanges(1);
+				//Options::ApplyChanges(1);
+				NotifyEventHooks(hHookOptionsChanged, 0, 0);
 				return TRUE;
 			}
 		}
 		break;
 	case WM_DESTROY:
 		break;
-	}	
+	}
 	//return DefWindowProc(hwndDlg, msg, wParam, lParam);
 	return FALSE;
 }
@@ -89,7 +99,10 @@ bool Options::BrowseFile(HWND hwndDlg, wchar_t* filter, wchar_t* defExt,  wchar_
 	ofn.nMaxFileTitle = maxLen;
 	ofn.lpstrDefExt = defExt;//"ivt";
 	if(GetOpenFileNameW(&ofn)) {
-		SetWindowTextW(hwndDlg, path);
+		//wchar_t path2[MAX_PATH] = L"";
+		//CallService(MS_UTILS_PATHTORELATIVEW, (WPARAM)path, (LPARAM)path2);
+		//MessageBoxW(NULL, path2, path, MB_OK);
+		//SetWindowTextW(hwndDlg, path2);
 		return true;
 	}
 	return false;
@@ -103,18 +116,59 @@ void Options::saveSettings(HWND hwnd) {
 	GetDlgItemTextW(hwnd,
 		IDC_TEMPLATE_PATH,
 		pszPath,
-		MAX_PATH);
-	//MessageBoxW(NULL, pszPath, L"Debug", MB_OK);
-	DBWriteContactSettingWString(NULL, eliseModuleName, "templatePath", pszPath);
+		MAX_PATH);	
+	//MessageBoxW(NULL, L"Saving settings", L"Debug", MB_OK);
+	DBWriteContactSettingTString(NULL, eliseModuleName, "templatePath", pszPath);
+	CallService(MS_UTILS_PATHTOABSOLUTEW, (WPARAM)pszPath, (LPARAM)pszPath);
+	qstrSkinPath = QString::fromWCharArray(pszPath);
+	qurlSkinPath = QUrl::fromLocalFile(qstrSkinPath);
+	TemplateMap::loadTemplate(qstrSkinPath);	
 }
 
-wchar_t* Options::getTemplatePath() {
-	wchar_t* path = _T("test");
-	return path;
+QString* Options::getTemplatePath() {	
+	return &qstrSkinPath;
 }
+
+QString Options::getRealTemplatePath() {	
+	return qstrSkinPath;
+}
+
+QUrl Options::getTemplateUrl() {
+	return qurlSkinPath;
+}
+
+bool Options::initOptions() {	
+	DBVARIANT dbv={0};	
+	wchar_t pszPath[MAX_PATH];
+
+	DBGetContactSettingTString(NULL,  eliseModuleName, "templatePath", &dbv);
+	if (lstrcmp(dbv.ptszVal, NULL) == 0) {
+		DBFreeVariant(&dbv);
+	} else
+	{
+		CallService(MS_UTILS_PATHTOABSOLUTEW, (WPARAM)dbv.ptszVal, (LPARAM)pszPath);
+		qstrSkinPath = QString::fromWCharArray(pszPath);
+		qurlSkinPath = QUrl::fromLocalFile(qstrSkinPath);
+	}	
+	
+	if (qstrSkinPath.isEmpty() || qstrSkinPath.isNull()) {
+		return false;
+	} else
+	{
+		return true;
+	}
+}
+
+//int Options::modulesLoaded(WPARAM wParam, LPARAM lParam) {
+	//if (Options::initOptions()) {		
+	//	TemplateMap::loadTemplate(Options::getRealTemplatePath());		
+	//}
+	//TemplateMap::loadBBCodes();
+	//return 0;
+//}
 
 // Options init
-int Options::InitOptions(WPARAM wParam, LPARAM lParam)
+int Options::initOptionsPage(WPARAM wParam, LPARAM lParam)
 {     
 	OPTIONSDIALOGPAGE odp = { 0 };
 
@@ -161,5 +215,6 @@ int Options::InitOptions(WPARAM wParam, LPARAM lParam)
 	odp.flags = ODPF_BOLDGROUPS | ODPF_TCHAR;
 	CallService(MS_OPT_ADDPAGE, wParam, (LPARAM) & odp);
 	*/
+
 	return 0;
 }

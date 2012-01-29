@@ -9,8 +9,9 @@ class TempalteMap;
 #include <QTextStream>
 #include <QMap>
 #include "main.h"
+#include "Elise.h"
 
-extern QString skinPath;
+//extern QString skinPath;
 
 class TemplateMap {
 private:
@@ -18,8 +19,8 @@ private:
 public:
 	static QMap<QString, QString> templateMap;
 	static QMap<QString, QRegExp> templateBBCodes;
-	static void LoadTemplate(const QString &fileName);
-	static void LoadBBCodes();
+	static void loadTemplate(const QString &fileName);
+	static void loadBBCodes();	
 
 };
 

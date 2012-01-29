@@ -53,8 +53,8 @@
 #define FONT_NUM 19
 
 
-QString oneShot = "oneShot";
-extern QUrl skinDir;
+//QString oneShot = "oneShot";
+//extern QUrl skinDir;
 
 
 HTMLBuilder::HTMLBuilder(Elise* view) {
@@ -122,13 +122,15 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 	}
 	}*/
 
+	int isHistory = 0;
+
 	IEVIEWEVENTDATA* eventData = event->eventData;
 	for (int eventIdx = 0; eventData!=NULL && (eventIdx < event->count || event->count==-1); eventData = eventData->next, eventIdx++) {
 		if (eventData->iType == IEED_EVENT_MESSAGE) {
 			int isSent = (eventData->dwFlags & IEEDF_SENT);
 			//int isRTL = (eventData->dwFlags & IEEDF_RTL) && tmpm->isRTL();
 			int isRTL = (eventData->dwFlags & IEEDF_RTL);
-			int isHistory = (eventData->time < (DWORD)getStartedTime() && (eventData->dwFlags & IEEDF_READ || eventData->dwFlags & IEEDF_SENT));
+			isHistory = (eventData->time < (DWORD)getStartedTime() && (eventData->dwFlags & IEEDF_READ || eventData->dwFlags & IEEDF_SENT));
 			//int isGroupBreak = TRUE;
 			//if ((getFlags(protoSettings) & Options::LOG_GROUP_MESSAGES) && eventData->dwFlags == LOWORD(getLastEventType())
 			//        && eventData->iType == IEED_EVENT_MESSAGE && HIWORD(getLastEventType()) == IEED_EVENT_MESSAGE
@@ -154,8 +156,8 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			}
 
 			// save old last event
-			lastEvent.replace(oneShot, "");
-			document += lastEvent;
+			//lastEvent.replace(oneShot, "");
+			//document += lastEvent;
 
 			if (isSent) {
 				qsAvatar = qsAvatarOut;
@@ -172,16 +174,16 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			qsDate = QString::fromAscii(timestampToString(NULL, eventData->time, 0));
 
 			// new lines
-			qsText.replace("\n", "<br>");
+			qsText.replace("\n", "<br>\n");
 
 			// working with BBCodes
 			replaceBBCodes(qsText);
 
 			// workin with url's         
-			//replaceURL(qsText);
+			replaceURL(qsText);
 
 			// final step of making message
-			lastEvent.replace("%base%", skinDir.path());  // base URL
+			lastEvent.replace("%base%", Options::getRealTemplatePath());  // base URL
 			lastEvent.replace("%name%", qsName);          // contact's name or user's name (depends on context)
 			lastEvent.replace("%time%", qsTime);          // event's time
 			lastEvent.replace("%date%", qsDate);          // event's date
@@ -193,9 +195,16 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			lastEvent.replace("%nameIn%", qsNameIn);      // contact's name
 			lastEvent.replace("%nameOut%", qsNameOut);    // users's name
 			lastEvent.replace("%proto%", QString::fromAscii(szProto)); // protocol name
-
+			//parentView->addToDoc(lastEvent);
+			if (isHistory)
+				history += lastEvent;			
 		}
 	}
+
+	if (isHistory)
+		parentView->reloadDoc();
+	else		
+		parentView->addToDoc(lastEvent);
 
 	if (szRealProto!=NULL) delete szRealProto;
 	if (szProto!=NULL) delete szProto;
@@ -438,50 +447,50 @@ void HTMLBuilder::getAvatar(HANDLE hContact, const char* szProto, QString& resul
 
 	// flash is not supported now
 	/*if (!DBGetContactSetting(hContact, "ContactPhoto", "File",&dbv)) {
-	if (strlen(dbv.pszVal) > 0) {
-	char* ext = strrchr(dbv.pszVal, '.');
-	if (ext && strcmpi(ext, ".xml") == 0) {
-	result = (char *)getFlashAvatar(dbv.pszVal, (hContact == NULL) ? 1 : 0);
-	} else {
-	if (result == NULL) {
-	// relative -> absolute
-	strcpy (tmpPath, dbv.pszVal);
-	if (ServiceExists(MS_UTILS_PATHTOABSOLUTE)&& strncmp(tmpPath, "http://", 7)) {
-	CallService(MS_UTILS_PATHTOABSOLUTE, (WPARAM)dbv.pszVal, (LPARAM)tmpPath);
-	}
-	result = tmpPath;
-	}
-	}
-	}
-	DBFreeVariant(&dbv);
+		if (strlen(dbv.pszVal) > 0) {
+			char* ext = strrchr(dbv.pszVal, '.');
+			if (ext && strcmpi(ext, ".xml") == 0) {
+				result = (char *)getFlashAvatar(dbv.pszVal, (hContact == NULL) ? 1 : 0);
+			} else {
+				if (result == NULL) {
+					// relative -> absolute
+					strcpy (tmpPath, dbv.pszVal);
+					if (ServiceExists(MS_UTILS_PATHTOABSOLUTE)&& strncmp(tmpPath, "http://", 7)) {
+						CallService(MS_UTILS_PATHTOABSOLUTE, (WPARAM)dbv.pszVal, (LPARAM)tmpPath);
+					}
+					result = tmpPath;
+				}
+			}
+		}
+		DBFreeVariant(&dbv);
 	}*/
 
-	if (result != NULL) {
-		result.replace(result, "<img src=\"" + result + "\">");
-	}
-	//return result;
-}/*
- const char* HTMLBuilder::getFlashAvatar(const char* file, int index) {
- if (time(NULL) - flashAvatarsTime[index] > 600 || flashAvatars[index] == NULL) {
- if (flashAvatars[index] != NULL) {
- delete flashAvatars[index];
- flashAvatars[index] = NULL;
- }
- flashAvatarsTime[index] = time(NULL);
- int src = _open(file, _O_BINARY | _O_RDONLY);
- if (src != -1) {
- char pBuf[2048];
- char *urlBuf;
- _read(src, pBuf, 2048);
- _close(src);
- urlBuf = strstr(pBuf, "<URL>");
- if(urlBuf) {
- flashAvatars[index]  = Utils::dupString(strtok(urlBuf + 5, "<\t\n\r"));
- }
- }
- }
- return flashAvatars[index];
- }*/
+		if (result != NULL) {
+			result.replace(result, "<img src=\"" + result + "\">");
+		}
+		//return result;
+}
+/*const char* HTMLBuilder::getFlashAvatar(const char* file, int index) {
+		if (time(NULL) - flashAvatarsTime[index] > 600 || flashAvatars[index] == NULL) {
+			if (flashAvatars[index] != NULL) {
+				delete flashAvatars[index];
+				flashAvatars[index] = NULL;
+			}
+			flashAvatarsTime[index] = time(NULL);
+			int src = _open(file, _O_BINARY | _O_RDONLY);
+			if (src != -1) {
+				char pBuf[2048];
+				char *urlBuf;
+				_read(src, pBuf, 2048);
+				_close(src);
+				urlBuf = strstr(pBuf, "<URL>");
+				if(urlBuf) {
+					flashAvatars[index]  = Utils::dupString(strtok(urlBuf + 5, "<\t\n\r"));
+				}
+			}
+		}
+		return flashAvatars[index];
+}*/
 
 void HTMLBuilder::replaceBBCodes(QString& text) {    
 	text.replace(TemplateMap::templateBBCodes["b"], "<b>\\1</b>");
@@ -501,62 +510,62 @@ void HTMLBuilder::replaceURL(QString& text) {
 	//((mailto\:|(news|(ht|f)tp(s?))\://){1}\S+) - source, not working in qt and not match url, that begins like "www..."
 	text.replace(QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)"), "<a class=\"link\" target=\"_self\" href=\"\\1\">\\1</a>");
 }
-
-/*void HTMLBuilder::replaceSmileys(HANDLE hContact, const char* proto, QString& text, bool isSent) {
-//TextToken *firstToken = NULL, *lastToken = NULL;
-SMADD_BATCHPARSE2 sp;
-SMADD_BATCHPARSERES* spRes;
-//int l = (int)wcslen(text);
-if (!Options::isSmileyAdd()) {
-return;
-}
-sp.cbSize = sizeof(sp);
-sp.Protocolname = proto;
-sp.flag = SAFL_PATH | SAFL_UNICODE | (isSent ? SAFL_OUTGOING : 0);
-//sp.wstr = (wchar_t*)text;
-text.toWCharArray(sp.wstr);
-sp.hContact = hContact;
-spRes = (SMADD_BATCHPARSERES*) CallService(MS_SMILEYADD_BATCHPARSE, 0, (LPARAM)&sp);
-int last_pos = 0;
-if (spRes != NULL) {
-for (int i = 0; i < (int)sp.numSmileys; i++) {
-if (spRes[i].filepath != NULL && strlen((char*)spRes[i].filepath) > 0) {
-if ((int)spRes[i].startChar - last_pos > 0) {
-TextToken *newToken = new TextToken(TEXT, text+last_pos, spRes[i].startChar-last_pos);
-if (lastToken == NULL) {
-firstToken = newToken;
-} else {
-lastToken->setNext(newToken);
-}
-lastToken = newToken;
-}
-TextToken *newToken = new TextToken(SMILEY, text+spRes[i].startChar, spRes[i].size);
-if (sp.oflag & SAFL_UNICODE) {
-newToken->setLink((wchar_t *)spRes[i].filepath);
-} else {
-newToken->setLink((char *)spRes[i].filepath);
-}
-if (lastToken == NULL) {
-firstToken = newToken;
-} else {
-lastToken->setNext(newToken);
-}
-lastToken = newToken;
-last_pos = spRes[i].startChar + spRes[i].size;
-}
-}
-CallService(MS_SMILEYADD_BATCHFREE, 0, (LPARAM)spRes);
-}
-if (last_pos < l)  {
-TextToken *newToken = new TextToken(TEXT, text+last_pos, l-last_pos);
-if (lastToken == NULL) {
-firstToken = newToken;
-} else {
-lastToken->setNext(newToken);
-}
-lastToken = newToken;
-}
-return;
+/*
+void HTMLBuilder::replaceSmileys(HANDLE hContact, const char* proto, QString& text, bool isSent) {
+	//TextToken *firstToken = NULL, *lastToken = NULL;
+	SMADD_BATCHPARSE2 sp;
+	SMADD_BATCHPARSERES* spRes;
+	//int l = (int)wcslen(text);
+	if (!Options::isSmileyAdd()) {
+		return;
+	}
+	sp.cbSize = sizeof(sp);
+	sp.Protocolname = proto;
+	sp.flag = SAFL_PATH | SAFL_UNICODE | (isSent ? SAFL_OUTGOING : 0);
+	//sp.wstr = (wchar_t*)text;
+	text.toWCharArray(sp.wstr);
+	sp.hContact = hContact;
+	spRes = (SMADD_BATCHPARSERES*) CallService(MS_SMILEYADD_BATCHPARSE, 0, (LPARAM)&sp);
+	int last_pos = 0;
+	if (spRes != NULL) {
+		for (int i = 0; i < (int)sp.numSmileys; i++) {
+			if (spRes[i].filepath != NULL && strlen((char*)spRes[i].filepath) > 0) {
+				if ((int)spRes[i].startChar - last_pos > 0) {
+					TextToken *newToken = new TextToken(TEXT, text+last_pos, spRes[i].startChar-last_pos);
+					if (lastToken == NULL) {
+						firstToken = newToken;
+					} else {
+						lastToken->setNext(newToken);
+					}
+					lastToken = newToken;
+				}
+				TextToken *newToken = new TextToken(SMILEY, text+spRes[i].startChar, spRes[i].size);
+				if (sp.oflag & SAFL_UNICODE) {
+					newToken->setLink((wchar_t *)spRes[i].filepath);
+				} else {
+					newToken->setLink((char *)spRes[i].filepath);
+				}
+				if (lastToken == NULL) {
+					firstToken = newToken;
+				} else {
+					lastToken->setNext(newToken);
+				}
+				lastToken = newToken;
+				last_pos = spRes[i].startChar + spRes[i].size;
+			}
+		}
+		CallService(MS_SMILEYADD_BATCHFREE, 0, (LPARAM)spRes);
+	}
+	if (last_pos < l)  {
+		TextToken *newToken = new TextToken(TEXT, text+last_pos, l-last_pos);
+		if (lastToken == NULL) {
+			firstToken = newToken;
+		} else {
+			lastToken->setNext(newToken);
+		}
+		lastToken = newToken;
+	}
+	return;
 }*/
 
 // TODO перелопатить
@@ -650,13 +659,33 @@ time_t HTMLBuilder::getStartedTime() {
 	return startedTime;
 }
 
-void HTMLBuilder::initDoc() {
-	document = TemplateMap::templateMap["<!--HTMLStart-->"];	
+void HTMLBuilder::initHead() {
+	header = TemplateMap::templateMap["<!--HTMLStart-->"];	
 }
 
-QString HTMLBuilder::getDoc() {
-	return document + lastEvent;
+QString HTMLBuilder::getLastEvent() {
+	//return header + document + lastEvent + "</body></html>";
+	return lastEvent;
 }
+
+QString HTMLBuilder::getHead() {
+	//return header + document + lastEvent + "</body></html>";
+	return header + "</body></html>";
+}
+
+QString HTMLBuilder::getHistory() {
+	return header + history + "</body></html>";
+}
+
+void HTMLBuilder::clearLastEvent() {
+	header.clear();
+	history.clear();
+	lastEvent.clear();
+}
+
+//void HTMLBuilder::addToDoc() {
+//	parentView->addToDoc(lastEvent);
+//}
 
 void HTMLBuilder::getUINs(HANDLE hContact, QString& uinIn, QString& uinOut) {
 	// взято в ieview, как и многое остальное.

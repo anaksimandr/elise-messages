@@ -22,10 +22,11 @@ class Elise;
 class QMyWebView : public QWebView {
     Q_OBJECT
 private:
-    Elise* parent;
-    virtual void contextMenuEvent(QContextMenuEvent * e);
+    Elise*			parent;
+	QWebInspector*	inspector;
+    virtual void	contextMenuEvent(QContextMenuEvent* e);
 public slots:
-    void showText();
+    void			callWebInspector();
 public:
     QMyWebView(QWidget* parentWidget, Elise* elise);
     ~QMyWebView();
@@ -37,7 +38,9 @@ private:
     static Elise* list;
     static CRITICAL_SECTION mutex;
     //static HWND hElise;
-    static bool isInited;
+    static bool		isInited;
+	static bool		templateInitialized;
+	//bool			isHeaderSet;
     HWND            hwnd;
     HWND            parent;
     Elise           *prev, *next;
@@ -45,6 +48,7 @@ private:
     int             width;
     QWinWidget*     mainWnd;
     QMyWebView*     webView;
+	//QWebView*		bufView;
     HTMLBuilder*    builder;
 protected:
     //void			navigate(const char *);
@@ -61,16 +65,18 @@ public:
     void            appendEventOld(IEVIEWEVENT * event);
     void            clear(IEVIEWEVENT * event);
     int             getSelection(IEVIEWEVENT * event);
-    //void            addToDoc(QString add);
+    void            addToDoc(QString add);	
+	void			reloadDoc();
     void            saveDocument();
-
+	
+	static void		setTemplateInit(bool isInit);
     static int      InitEliseMessages(void);
     static void     ReleaseEliseMessages(void);
 //public slots:
     //void            loadStarted();
     //void            loadFinished();
 private slots:
-    void              linkClicked(QUrl url);
+    void			linkClicked(QUrl url);
 };
 
 

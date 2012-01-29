@@ -28,6 +28,7 @@
 #include "m_metacontacts.h"
 #include <m_avatars.h>
 #include "m_smileyadd.h"
+//#include <QMessageBox>
 
 extern HINSTANCE hEliseInst;
 extern char* eliseModuleName;

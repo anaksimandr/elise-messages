@@ -13,6 +13,7 @@ class HTMLBuilder;
 #include "utils.h"
 #include <m_contacts.h>
 #include "template.h"
+#include "options.h"
 
 #define EVENTTYPE_STATUSCHANGE 25368
 #define EVENTTYPE_JABBER_CHATSTATES     2000
@@ -30,36 +31,40 @@ private:
 		ENF_ALL = 255,
 		ENF_CHAT_FORMATTING = 256
 	};
-	Elise* parentView;
-	QString document;
-	QString lastEvent;
+	Elise*			parentView;
+	QString			header;
+	QString			history;
+	QString			lastEvent;
 
-	IEVIEWEVENT lastIEViewEvent;
-	time_t startedTime;
-	char* getProto(HANDLE hContact);
-	char* getProto(const char* proto, HANDLE hContact);
-	char* timestampToString(DWORD dwFlags, time_t check, int mode);
-	HANDLE getRealContact(HANDLE hContact);
-	void getUINs(HANDLE hContact, QString& uinIn, QString& uinOut);
-	void getAvatar(HANDLE hContact, const char* szProto, QString& result);
-	void replaceBBCodes(QString& text);
-	void replaceURL(QString& text);
-	void appendEventTemplate(Elise* view, IEVIEWEVENT* event);
-	void setLastIEViewEvent(IEVIEWEVENT* event);
-	bool isDbEventShown(DWORD dwFlags, DBEVENTINFO* dbei);
-	bool isDbEventShown(DBEVENTINFO* dbei);
-	wchar_t* getContactName(HANDLE hContact, const char* szProto);
-	//void addToDoc(QString* text, QString* name, QString* uinIn, QString* uinOut);
+	IEVIEWEVENT		lastIEViewEvent;
+	time_t			startedTime;
+	char*			getProto(HANDLE hContact);
+	char*			getProto(const char* proto, HANDLE hContact);
+	char*			timestampToString(DWORD dwFlags, time_t check, int mode);
+	HANDLE			getRealContact(HANDLE hContact);
+	void			getUINs(HANDLE hContact, QString& uinIn, QString& uinOut);
+	void			getAvatar(HANDLE hContact, const char* szProto, QString& result);
+	void			replaceBBCodes(QString& text);
+	void			replaceURL(QString& text);
+	void			appendEventTemplate(Elise* view, IEVIEWEVENT* event);
+	void			setLastIEViewEvent(IEVIEWEVENT* event);
+	bool			isDbEventShown(DWORD dwFlags, DBEVENTINFO* dbei);
+	bool			isDbEventShown(DBEVENTINFO* dbei);
+	wchar_t*		getContactName(HANDLE hContact, const char* szProto);
+	//void addToDoc();
 public:
 	HTMLBuilder(Elise* view);
 	~HTMLBuilder();
 
-	void initDoc();
-	QString getDoc();
-	void appendEventOld(Elise*, IEVIEWEVENT* event);
-	void appendEventNew(Elise* view, IEVIEWEVENT* event);
-	void appendEvent(Elise*, IEVIEWEVENT* event);
-	time_t getStartedTime();
+	QString			getHead();
+	QString			getLastEvent();
+	QString			getHistory();
+	void			initHead();
+	void			clearLastEvent();
+	void			appendEventOld(Elise*, IEVIEWEVENT* event);
+	void			appendEventNew(Elise* view, IEVIEWEVENT* event);
+	void			appendEvent(Elise*, IEVIEWEVENT* event);
+	time_t			getStartedTime();
 };
 
 

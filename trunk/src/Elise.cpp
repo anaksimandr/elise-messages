@@ -14,11 +14,14 @@ Elise Messages Plugin for Miranda IM
 Elise* Elise::list = NULL;
 CRITICAL_SECTION Elise::mutex;
 bool Elise::isInited = false;
+bool Elise::templateInitialized = false;
 
 // эта хрень пока повисит тут, т.к. опций нет
 // путь задаетс€ относительно miranda.exe
-QString skinPath("Skins/IEView/testSkin/myskin.ivt");
-QUrl skinDir = QUrl(QDir::currentPath() + "/" + skinPath);
+// moved to Options::skinPath
+//QString skinPath("Skins/IEView/testSkin/myskin.ivt");
+//QUrl skinDir = QUrl(QDir::currentPath() + "/" + skinPath);
+QString noTemplate = "Go to options";
 
 Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 
@@ -32,20 +35,29 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 	builder = new HTMLBuilder(this);
 	mainWnd = new QWinWidget(parent);
 	webView = new QMyWebView(mainWnd, this);
-
-	builder->initDoc();
+	//bufView = new QWebView();
 
 	webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 	QObject::connect(webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)),
-		Qt::DirectConnection);
+		Qt::DirectConnection);	
 
 	hwnd = mainWnd->winId();
 
 	webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 	webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
 	webView->settings()->setMaximumPagesInCache(0);
+	webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
-	webView->setHtml(builder->getDoc(), skinDir);
+	if (templateInitialized) {
+		builder->initHead();
+		webView->setHtml(builder->getHead(), Options::getTemplateUrl());
+		//isHeaderSet = true;
+	}
+	else {
+		webView->setHtml(noTemplate, Options::getTemplateUrl());
+		//isHeaderSet = false;
+	}
+	//webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(" ");
 	//webView->settings()->JavaEnabled = QWebSettings::JavascriptEnabled;
 	//webView->settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 
@@ -57,7 +69,7 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 		next->prev = this;
 	}
 	list = this;
-	LeaveCriticalSection(&mutex);
+	LeaveCriticalSection(&mutex);	
 }
 
 Elise::~Elise() {
@@ -76,6 +88,7 @@ Elise::~Elise() {
 
 	builder->~HTMLBuilder();
 	webView->~QMyWebView();
+	//bufView->~QWebView();
 	mainWnd->~QWinWidget();
 }
 
@@ -85,14 +98,14 @@ QMyWebView::QMyWebView(QWidget* parentWidget, Elise* elise) {
 }
 
 QMyWebView::~QMyWebView() {
-
+	inspector->~QWebInspector();
 }
 
 void QMyWebView::contextMenuEvent(QContextMenuEvent* e) {
 	QMenu* menu = new QMenu(this);
 
-	QAction* menuAction = new QAction("Show HTML source",this);
-	connect(menuAction,SIGNAL(triggered()),this,SLOT(showText()));
+	QAction* menuAction = new QAction("Web Inspector",this);
+	connect(menuAction,SIGNAL(triggered()),this,SLOT(callWebInspector()));
 
 	menu->addAction(menuAction);
 	menu->exec(e->globalPos());
@@ -118,7 +131,7 @@ Elise* Elise::get(HWND hwnd) {
 }
 
 QString Elise::getHTML() {
-	return builder->getDoc();
+	return webView->page()->mainFrame()->toHtml();
 }
 
 void Elise::setWindowPos(int x, int y, int cx, int cy) {    
@@ -135,19 +148,77 @@ void Elise::scrollToBottom() {
 }
 
 void Elise::appendEvent(IEVIEWEVENT* event) {
-	if (event->eventData == NULL) {return; }
-	builder->appendEventNew(this, event);
-	webView->setHtml(builder->getDoc(), skinDir);
+	if (templateInitialized) {
+		if (event->eventData == NULL) {return; }
+		builder->appendEventNew(this, event);
+		//webView->setHtml(builder->getLastEvent(), Options::getTemplateUrl());
+		//addToDoc();
+	}
 }
 
-void Elise::appendEventOld(IEVIEWEVENT* event) {
-	builder->appendEventOld(this, event);
-	webView->setHtml(builder->getDoc(), skinDir);    
+void Elise::appendEventOld(IEVIEWEVENT* event) {	
+	if (templateInitialized) {
+		//bufView->setHtml(builder->getHead(), Options::getTemplateUrl());
+		builder->appendEventOld(this, event);
+		//webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
+		//addToDoc();
+	}
+}
+
+void Elise::reloadDoc() {
+	webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
+}
+
+void Elise::addToDoc(QString add) {	
+	
+	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(add);
+
+	QRegExp rxScriptSplit = QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive);
+	QRegExp rxScriptReplace = QRegExp(".*<script([^>]*)>(.*)</script>.*", Qt::CaseInsensitive);
+	rxScriptSplit.setMinimal(true);
+
+	QString qstrClass;
+	QString qstrSource;
+	
+	for (int i=0; i<add.count(rxScriptSplit); i++) {
+		//qstrClass = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
+		//qstrSource = qstrClass;
+		qstrSource = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
+		qstrClass.replace(rxScriptReplace, "\\1");
+		qstrSource.replace(rxScriptReplace, "\\2");
+		//if (qstrClass.isEmpty())
+			webView->page()->mainFrame()->documentElement().findFirst("body").lastChild().evaluateJavaScript(qstrSource);
+		/*else {
+			//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
+			//QVariant returned = webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
+			//QWebPage tmpPage;
+			//tmpPage.mainFrame()->setHtml(builder->getHead(), Options::getTemplateUrl());
+			//bufView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
+			QWebElement* elem =new QWebElement( webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]"));
+			elem->evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
+			QMessageBox qmes;
+			qmes.setText(elem->toPlainText());
+			qmes.exec();
+			//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").parent().setPlainText("<script>_getitall('кен','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);</script>");
+			webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").setAttribute("class", "notAvailable");
+		}*/
+	}
+
+	//QMessageBox qmes;
+	//for (int i=0; i<countScripts*2; i++) {
+	//	qmes.setText(list[i]);
+	//	qmes.exec();
+	//}
 }
 
 void Elise::clear(IEVIEWEVENT* event) {
-	// пока не пон€л, что тут должно быть =)
-	// наверное очищение окна лога..«ј¬“–ќћЁЌ!
+	//builder->clearLastEvent();	
+	if (templateInitialized) {
+		builder->initHead();
+		webView->setHtml(builder->getHead(), Options::getTemplateUrl());
+	}
+	else
+		webView->setHtml(noTemplate, Options::getTemplateUrl());
 }
 
 int Elise::getSelection(IEVIEWEVENT* event) {
@@ -164,23 +235,29 @@ void Elise::linkClicked(QUrl url) {
 	QDesktopServices::openUrl(url);
 }
 
+void Elise::setTemplateInit(bool isInit) {
+	templateInitialized = isInit;
+}
+
 int Elise::InitEliseMessages(void)
 {
 	if (isInited) return 0;
 	isInited = true;
-	InitializeCriticalSection(&mutex);
+	InitializeCriticalSection(&mutex);	
 
-	Utils::hookEvent_Ex(ME_OPT_INITIALISE, Options::InitOptions);
-	//Utils::hookEvent_Ex(ME_SYSTEM_MODULESLOADED, Utils::ModulesLoaded);
+	if (Options::initOptions()) {		
+		TemplateMap::loadTemplate(Options::getRealTemplatePath());		
+	}
+	TemplateMap::loadBBCodes();
+
+	Utils::hookEvent_Ex(ME_OPT_INITIALISE, Options::initOptionsPage);
+	//Utils::hookEvent_Ex(ME_SYSTEM_MODULESLOADED, Options::modulesLoaded);
 	//Utils::hookEvent_Ex(ME_SYSTEM_PRESHUTDOWN, PreShutdown);
 
 	Utils::createServiceFunction_Ex(MS_IEVIEW_WINDOW, (MIRANDASERVICE)HandleEliseWindow);
 	Utils::createServiceFunction_Ex(MS_IEVIEW_EVENT, (MIRANDASERVICE)HandleEliseEvent);
 	//utils::createServiceFunction_Ex(MS_IEVIEW_EVENT,(MIRANDASERVICE) HandleIENavigate);
 	hHookOptionsChanged = CreateHookableEvent(ME_IEVIEW_OPTIONSCHANGED);
-
-	TemplateMap::LoadTemplate(skinPath);
-	TemplateMap::LoadBBCodes();
 
 	return 0;
 }
@@ -194,13 +271,11 @@ void Elise::ReleaseEliseMessages() {
 	DeleteCriticalSection(&mutex);
 }
 
-void QMyWebView::showText() {
-	//QDialog* dlg = new QDialog(this);
-	QTextEdit* view = new QTextEdit();
-	view->resize(500, 500);
-	view->setWindowTitle("HTML code");
-	view->setText(parent->getHTML());
-	view->show();
-	//QProcess* proc=new QProcess(this);
-	//proc->start("explorer D:/file.doc");
+void QMyWebView::callWebInspector() {
+	if (!inspector) {
+		inspector = new QWebInspector();
+		inspector->setPage(this->page());
+		inspector->resize(800, 600);
+	}
+	inspector->show();
 }
