@@ -8,6 +8,8 @@
 //замена __declspec(dllexport)
 //#define D_SHARED Q_DECL_EXPORT
 
+#define SIZEOF(X) (sizeof(X)/sizeof(X[0]))
+
 #define MIRANDA_VER 0x0900
 
 //#include <QMfcApp>
