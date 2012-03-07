@@ -6,9 +6,10 @@ class Elise;
 QMap<QString, QString> TemplateMap::templateMap;
 QMap<QString, QRegExp> TemplateMap::templateBBCodes;
 
-static const int templatesNumber = 48;
-static const QString templateNames[48] = {
+static const int templatesNumber = 50;
+static const QString templateNames[templatesNumber] = {
 	"<!--HTMLStart-->",
+	"<!--HTMLEnd-->",
 	"<!--MessageIn-->",
 	"<!--MessageOut-->",
 	"<!--hMessageIn-->",
@@ -41,6 +42,7 @@ static const QString templateNames[48] = {
 	"<!--hURLOut-->",
 
 	"<!--HTMLStartRTL-->",
+	"<!--HTMLEndRTL-->",
 	"<!--MessageInRTL-->",
 	"<!--MessageOutRTL-->",
 	"<!--hMessageInRTL-->",
@@ -80,7 +82,8 @@ void TemplateMap::loadTemplate(const QString &fileName) {
 		// если дошли до нового шаблона - сохраняемся
 		for (int i=0; i < templatesNumber; i++){
 			if (bufTrim == templateNames[i]) {
-				if (parseInited) templateMap[tmplName] = tmplBuf;
+				if (parseInited)
+					templateMap[tmplName] = tmplBuf;
 				tmplBuf.clear();
 				tmplName = bufTrim;
 				if (!parseInited) parseInited = true;
@@ -88,6 +91,7 @@ void TemplateMap::loadTemplate(const QString &fileName) {
 		}
 		// иначе продолжаем запись старого
 		tmplBuf += buf;
+		tmplBuf += "\n";
 	}
 	templateMap[tmplName] = tmplBuf;
 	Elise::setTemplateInit(true);	

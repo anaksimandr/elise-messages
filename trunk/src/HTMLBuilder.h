@@ -22,6 +22,8 @@ class Elise;
 
 class HTMLBuilder {
 private:
+	DWORD lastEventTime;
+	int iLastEventType;
 	enum ENCODEFLAGS {
 		ENF_NONE = 0,
 		ENF_SMILEYS = 1,
@@ -33,8 +35,10 @@ private:
 	};
 	Elise*			parentView;
 	QString			header;
+	QString			footer;
 	QString			history;
 	QString			lastEvent;
+	//QString			document;
 
 	IEVIEWEVENT		lastIEViewEvent;
 	time_t			startedTime;
@@ -46,11 +50,16 @@ private:
 	void			getAvatar(HANDLE hContact, const char* szProto, QString& result);
 	void			replaceBBCodes(QString& text);
 	void			replaceURL(QString& text);
+	void			replaceSmileys(QString& text, bool isSent, HANDLE hContact, char* szProto);
 	void			appendEventTemplate(Elise* view, IEVIEWEVENT* event);
 	void			setLastIEViewEvent(IEVIEWEVENT* event);
 	bool			isDbEventShown(DWORD dwFlags, DBEVENTINFO* dbei);
 	bool			isDbEventShown(DBEVENTINFO* dbei);
 	wchar_t*		getContactName(HANDLE hContact, const char* szProto);
+	DWORD			getLastEventTime();
+	void			setLastEventTime(DWORD);
+	int				getLastEventType();
+	void			setLastEventType(int);
 	//void addToDoc();
 public:
 	HTMLBuilder(Elise* view);
@@ -59,8 +68,10 @@ public:
 	QString			getHead();
 	QString			getLastEvent();
 	QString			getHistory();
+	//QString			getDocument();
+	//void			setDocument(QString doc);
 	void			initHead();
-	void			clearLastEvent();
+	void			clearDoc(IEVIEWEVENT* event);
 	void			appendEventOld(Elise*, IEVIEWEVENT* event);
 	void			appendEventNew(Elise* view, IEVIEWEVENT* event);
 	void			appendEvent(Elise*, IEVIEWEVENT* event);

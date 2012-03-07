@@ -40,6 +40,7 @@ int HandleEliseEvent(WPARAM wParam, LPARAM lParam) {
 	if (view != NULL) {
 		if (event->iType == IEE_LOG_DB_EVENTS) {
 			view->appendEventOld(event);
+			//MessageBox(NULL, L"IEE_LOG_DB_EVENTS", L"Debug", MB_OK);
 		}
 		else if (event->iType == IEE_CLEAR_LOG) {
 			view->clear(event);
@@ -52,6 +53,7 @@ int HandleEliseEvent(WPARAM wParam, LPARAM lParam) {
 		}
 		else if (event->iType == IEE_LOG_MEM_EVENTS) {
 			view->appendEvent(event);
+			//MessageBox(NULL, L"IEE_LOG_MEM_EVENTS", L"Debug", MB_OK);
 		}
 	}
 	return 0;

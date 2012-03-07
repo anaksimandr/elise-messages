@@ -23,7 +23,7 @@ class QMyWebView : public QWebView {
     Q_OBJECT
 private:
     Elise*			parent;
-	QWebInspector*	inspector;
+	//QWebInspector*	inspector;
     virtual void	contextMenuEvent(QContextMenuEvent* e);
 public slots:
     void			callWebInspector();
@@ -65,7 +65,7 @@ public:
     void            appendEventOld(IEVIEWEVENT * event);
     void            clear(IEVIEWEVENT * event);
     int             getSelection(IEVIEWEVENT * event);
-    void            addToDoc(QString add);	
+    void            addToDoc();	
 	void			reloadDoc();
     void            saveDocument();
 	

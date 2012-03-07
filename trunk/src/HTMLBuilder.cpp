@@ -53,17 +53,32 @@
 #define FONT_NUM 19
 
 
-//QString oneShot = "oneShot";
+QString oneShot = "oneShot";
 //extern QUrl skinDir;
 
 
 HTMLBuilder::HTMLBuilder(Elise* view) {
+	setLastEventType(-1);
+	setLastEventTime(time(NULL));
+	lastEventTime = time(NULL);
 	startedTime = time(NULL);
 	parentView = view;
+
+	lastIEViewEvent.cbSize = sizeof (IEVIEWEVENT);
+	lastIEViewEvent.iType = IEE_LOG_MEM_EVENTS;
+	lastIEViewEvent.codepage = CP_UTF8;
+	lastIEViewEvent.pszProto = NULL;
+	lastIEViewEvent.count = 0;
+	lastIEViewEvent.dwFlags = 0;
+	lastIEViewEvent.hContact = NULL;
+	lastIEViewEvent.hwnd = NULL;
+	lastIEViewEvent.eventData = NULL;
 }
 
 HTMLBuilder::~HTMLBuilder() {
-	// some code
+	if (lastIEViewEvent.pszProto != NULL) {
+		delete (char*)lastIEViewEvent.pszProto;
+	}
 }
 
 void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
@@ -176,11 +191,14 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			// new lines
 			qsText.replace("\n", "<br>\n");
 
+			// workin with url's         
+			replaceURL(qsText);
+
 			// working with BBCodes
 			replaceBBCodes(qsText);
 
-			// workin with url's         
-			replaceURL(qsText);
+			// workin with smileys         
+			replaceSmileys(qsText,isSent, event->hContact, szProto);
 
 			// final step of making message
 			lastEvent.replace("%base%", Options::getRealTemplatePath());  // base URL
@@ -197,14 +215,17 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			lastEvent.replace("%proto%", QString::fromAscii(szProto)); // protocol name
 			//parentView->addToDoc(lastEvent);
 			if (isHistory)
-				history += lastEvent;			
+				history += lastEvent;
+
+			setLastEventType(MAKELONG(eventData->dwFlags, eventData->iType));
+			setLastEventTime(eventData->time);
 		}
 	}
 
 	if (isHistory)
 		parentView->reloadDoc();
 	else		
-		parentView->addToDoc(lastEvent);
+		parentView->addToDoc();
 
 	if (szRealProto!=NULL) delete szRealProto;
 	if (szProto!=NULL) delete szProto;
@@ -497,7 +518,7 @@ void HTMLBuilder::replaceBBCodes(QString& text) {
 	text.replace(TemplateMap::templateBBCodes["s"], "<s>\\1</s>");
 	text.replace(TemplateMap::templateBBCodes["i"], "<i>\\1</i>");
 	text.replace(TemplateMap::templateBBCodes["u"], "<u>\\1</u>");
-	text.replace(TemplateMap::templateBBCodes["img"], "<div><img class=\"img\" style=\"max-width:100%;\" src=\"\\1\" /></div>");
+	text.replace(TemplateMap::templateBBCodes["img"], "<div><img class=\"img\" style=\"max-width:100%;\" src=\"\\1\" ></div>");
 	text.replace(TemplateMap::templateBBCodes["code"], "<tt>\\1</tt>");
 	text.replace(TemplateMap::templateBBCodes["quote"], "<blockquote>\\1</blockquote>");
 	text.replace(TemplateMap::templateBBCodes["size"], "<span style=\"font-size:\\1pt;\">\\2</span>");
@@ -508,65 +529,64 @@ void HTMLBuilder::replaceBBCodes(QString& text) {
 void HTMLBuilder::replaceURL(QString& text) {
 	//text.replace(QRegExp("((?:https?|ftp)://\\S+)"), "<a class=\"link\" target=\"_self\" href=\"\\1\">\\1</a>");
 	//((mailto\:|(news|(ht|f)tp(s?))\://){1}\S+) - source, not working in qt and not match url, that begins like "www..."
-	text.replace(QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)"), "<a class=\"link\" target=\"_self\" href=\"\\1\">\\1</a>");
+	//text.replace(QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)(?!"), "<a class=\"link\" target=\"_self\" href=\"\\1\">\\1</a>");
+	//-- Create URL regExp
+	QRegExp rx = QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)");
+	QString qstrBuf;
+	QString qstrCurURL;
+	int pos = 0;
+	int len = 0;
+	//-- While finds matche
+	while ((pos = rx.indexIn(text, pos)) != -1) {
+		//-- Get length of matche
+		len = rx.matchedLength();
+		//-- Save matche
+		qstrCurURL = rx.cap(0);
+		//-- Get wide string (+10 characters at start and end, thought it's enough)
+		qstrBuf = text.mid(pos - 10, 10) + qstrCurURL + text.mid(pos + len, 10);
+		//-- If the wide string does not matche [img] bbcode
+		if (!TemplateMap::templateBBCodes["img"].exactMatch(qstrBuf))
+			//-- Replace matche with HTML-formated URL
+			text.replace(pos, len,"<a class=\"link\" target=\"_self\" href=\"\\1\">" + qstrCurURL + "</a>");
+		//-- Position incrementation
+		pos += len;
+	}
 }
-/*
-void HTMLBuilder::replaceSmileys(HANDLE hContact, const char* proto, QString& text, bool isSent) {
-	//TextToken *firstToken = NULL, *lastToken = NULL;
+
+void HTMLBuilder::replaceSmileys(QString& text, bool isSent, HANDLE hContact, char* szProto)
+{	
 	SMADD_BATCHPARSE2 sp;
 	SMADD_BATCHPARSERES* spRes;
-	//int l = (int)wcslen(text);
-	if (!Options::isSmileyAdd()) {
+
+	if (!ServiceExists(MS_SMILEYADD_BATCHPARSE)) {
 		return;
 	}
 	sp.cbSize = sizeof(sp);
-	sp.Protocolname = proto;
+	sp.Protocolname = szProto;
 	sp.flag = SAFL_PATH | SAFL_UNICODE | (isSent ? SAFL_OUTGOING : 0);
-	//sp.wstr = (wchar_t*)text;
-	text.toWCharArray(sp.wstr);
+
+	//-- Translate QString to wchar_t*
+	wchar_t* wszText = new wchar_t[text.size()+1];
+	text.toWCharArray(wszText);
+	wszText[text.size()] = 0;
+	sp.str = (wchar_t*)wszText;
+	
 	sp.hContact = hContact;
 	spRes = (SMADD_BATCHPARSERES*) CallService(MS_SMILEYADD_BATCHPARSE, 0, (LPARAM)&sp);
 	int last_pos = 0;
 	if (spRes != NULL) {
 		for (int i = 0; i < (int)sp.numSmileys; i++) {
 			if (spRes[i].filepath != NULL && strlen((char*)spRes[i].filepath) > 0) {
-				if ((int)spRes[i].startChar - last_pos > 0) {
-					TextToken *newToken = new TextToken(TEXT, text+last_pos, spRes[i].startChar-last_pos);
-					if (lastToken == NULL) {
-						firstToken = newToken;
-					} else {
-						lastToken->setNext(newToken);
-					}
-					lastToken = newToken;
-				}
-				TextToken *newToken = new TextToken(SMILEY, text+spRes[i].startChar, spRes[i].size);
-				if (sp.oflag & SAFL_UNICODE) {
-					newToken->setLink((wchar_t *)spRes[i].filepath);
-				} else {
-					newToken->setLink((char *)spRes[i].filepath);
-				}
-				if (lastToken == NULL) {
-					firstToken = newToken;
-				} else {
-					lastToken->setNext(newToken);
-				}
-				lastToken = newToken;
+				text.replace(spRes[i].startChar, spRes[i].size, "<img class=\"img\" style=\"max-width:100%;\" src=\"" + QString::fromWCharArray(spRes[i].filepath) + "\" >");
 				last_pos = spRes[i].startChar + spRes[i].size;
 			}
 		}
 		CallService(MS_SMILEYADD_BATCHFREE, 0, (LPARAM)spRes);
+		
 	}
-	if (last_pos < l)  {
-		TextToken *newToken = new TextToken(TEXT, text+last_pos, l-last_pos);
-		if (lastToken == NULL) {
-			firstToken = newToken;
-		} else {
-			lastToken->setNext(newToken);
-		}
-		lastToken = newToken;
-	}
+	delete[] wszText;
 	return;
-}*/
+}
 
 // TODO перелопатить
 char* HTMLBuilder::timestampToString(DWORD dwFlags, time_t check, int mode) {
@@ -621,9 +641,9 @@ void HTMLBuilder::setLastIEViewEvent(IEVIEWEVENT* event) {
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// вот тут может крашить
-	//if (lastIEViewEvent.pszProto != NULL) {
-	//	delete (char*)lastIEViewEvent.pszProto ;
-	//}
+	if (lastIEViewEvent.pszProto != NULL) {
+		delete (char*)lastIEViewEvent.pszProto ;
+	}
 	if (event->cbSize >= IEVIEWEVENT_SIZE_V3 && event->pszProto != NULL) {
 		lastIEViewEvent.pszProto = Utils::dupString(event->pszProto);
 	} else {
@@ -660,7 +680,8 @@ time_t HTMLBuilder::getStartedTime() {
 }
 
 void HTMLBuilder::initHead() {
-	header = TemplateMap::templateMap["<!--HTMLStart-->"];	
+	header = TemplateMap::templateMap["<!--HTMLStart-->"];
+	footer = TemplateMap::templateMap["<!--HTMLEnd-->"];
 }
 
 QString HTMLBuilder::getLastEvent() {
@@ -670,17 +691,24 @@ QString HTMLBuilder::getLastEvent() {
 
 QString HTMLBuilder::getHead() {
 	//return header + document + lastEvent + "</body></html>";
-	return header + "</body></html>";
+	return header + footer;
 }
 
 QString HTMLBuilder::getHistory() {
-	return header + history + "</body></html>";
+	return header + history + footer;
 }
 
-void HTMLBuilder::clearLastEvent() {
+void HTMLBuilder::clearDoc(IEVIEWEVENT* event) {
 	header.clear();
 	history.clear();
 	lastEvent.clear();
+
+	if (event != NULL) {
+		setLastIEViewEvent(event);
+	}
+	if (lastIEViewEvent.pszProto != NULL || event->hContact == NULL) {
+		setLastEventType(-1);
+	}
 }
 
 //void HTMLBuilder::addToDoc() {
@@ -729,4 +757,20 @@ void HTMLBuilder::getUINs(HANDLE hContact, QString& uinIn, QString& uinOut) {
 	uinOut = QString::fromUtf8(buf);
 
 	delete szProto;
+}
+
+int HTMLBuilder::getLastEventType() {
+	return iLastEventType;
+}
+
+void HTMLBuilder::setLastEventType(int t) {
+	iLastEventType = t;
+}
+
+DWORD HTMLBuilder::getLastEventTime() {
+	return lastEventTime;
+}
+
+void HTMLBuilder::setLastEventTime(DWORD t) {
+	lastEventTime = t;
 }

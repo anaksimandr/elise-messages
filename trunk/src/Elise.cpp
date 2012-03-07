@@ -46,7 +46,7 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 	webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 	webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
 	webView->settings()->setMaximumPagesInCache(0);
-	webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+	//webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
 	if (templateInitialized) {
 		builder->initHead();
@@ -98,7 +98,7 @@ QMyWebView::QMyWebView(QWidget* parentWidget, Elise* elise) {
 }
 
 QMyWebView::~QMyWebView() {
-	inspector->~QWebInspector();
+	//inspector->~QWebInspector();
 }
 
 void QMyWebView::contextMenuEvent(QContextMenuEvent* e) {
@@ -151,28 +151,50 @@ void Elise::appendEvent(IEVIEWEVENT* event) {
 	if (templateInitialized) {
 		if (event->eventData == NULL) {return; }
 		builder->appendEventNew(this, event);
-		//webView->setHtml(builder->getLastEvent(), Options::getTemplateUrl());
+		//webView->setHtml(builder->getDocument(), Options::getTemplateUrl());
+		//builder->setDocument(webView->page()->mainFrame()->toHtml());
 		//addToDoc();
 	}
 }
 
-void Elise::appendEventOld(IEVIEWEVENT* event) {	
+void Elise::appendEventOld(IEVIEWEVENT* event) {
 	if (templateInitialized) {
-		//bufView->setHtml(builder->getHead(), Options::getTemplateUrl());
+		//if (event->eventData == NULL) {return; }
+		//builder->setDocument(webView->page()->mainFrame()->toHtml());
+		//bufView->setHtml(builder->getHead(), Options::getTemplateUrl());			
 		builder->appendEventOld(this, event);
-		//webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
+		//QList<QWebFrame*> frameList;
+		//webView->page()->mainFrame()->documentElement().findFirst("body").appendInside("<iframe <html><body><p>—ерпантинна€ волна выстраивает октавер, благодар€ широким мелодическим скачкам.</p>\" src=\"nosrcdoc.html></iframe>");
+		//frameList = webView->page()->mainFrame()->childFrames();
+		//QMessageBox qmes;
+		//for (int i = 0; i < frameList.count(); i++) {
+		//	qmes.setText(frameList[i]->toHtml());
+		//	qmes.exec();
+		//}
+		//webView->page()->mainFrame()->childFrames().last()->setHtml("<div>test1</div><div>test2</div>", Options::getTemplateUrl());
+		//webView->page()->mainFrame()->childFrames()[0]->load(Options::getTemplateUrl());
+		//webView->setHtml(builder->getDocument(), Options::getTemplateUrl());
+		//QMessageBox qmes;
+		//qmes.setText(webView->page()->mainFrame()->toHtml());
+		//qmes.exec();
+				
 		//addToDoc();
 	}
 }
 
 void Elise::reloadDoc() {
+	//webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
 	webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
+	//builder->setDocument(webView->page()->mainFrame()->toHtml());
 }
 
-void Elise::addToDoc(QString add) {	
+void Elise::addToDoc() {	
+	//builder->setDocument(webView->page()->mainFrame()->toHtml());
+	//webView->setHtml(builder->getDocument(), Options::getTemplateUrl());
+	//builder->setDocument(webView->page()->mainFrame()->toHtml());
 	
-	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(add);
-
+	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(builder->getLastEvent());
+	/*
 	QRegExp rxScriptSplit = QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive);
 	QRegExp rxScriptReplace = QRegExp(".*<script([^>]*)>(.*)</script>.*", Qt::CaseInsensitive);
 	rxScriptSplit.setMinimal(true);
@@ -181,41 +203,35 @@ void Elise::addToDoc(QString add) {
 	QString qstrSource;
 	
 	for (int i=0; i<add.count(rxScriptSplit); i++) {
-		//qstrClass = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
-		//qstrSource = qstrClass;
-		qstrSource = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
+		qstrClass = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
+		qstrSource = qstrClass;
+		//qstrSource = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
 		qstrClass.replace(rxScriptReplace, "\\1");
 		qstrSource.replace(rxScriptReplace, "\\2");
-		//if (qstrClass.isEmpty())
+		if (qstrClass.isEmpty())
 			webView->page()->mainFrame()->documentElement().findFirst("body").lastChild().evaluateJavaScript(qstrSource);
-		/*else {
+		else {
 			//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
 			//QVariant returned = webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
 			//QWebPage tmpPage;
 			//tmpPage.mainFrame()->setHtml(builder->getHead(), Options::getTemplateUrl());
 			//bufView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
-			QWebElement* elem =new QWebElement( webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]"));
-			elem->evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
-			QMessageBox qmes;
-			qmes.setText(elem->toPlainText());
-			qmes.exec();
+			//QWebElement* elem =new QWebElement( webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]"));
+			//elem->evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
+			qstrClass.replace(QRegExp("class=\"(.+)\""), "\\1");			
 			//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").parent().setPlainText("<script>_getitall('кен','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);</script>");
-			webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").setAttribute("class", "notAvailable");
-		}*/
-	}
-
-	//QMessageBox qmes;
-	//for (int i=0; i<countScripts*2; i++) {
-	//	qmes.setText(list[i]);
-	//	qmes.exec();
-	//}
+			//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").setAttribute("class", "notAvailable");
+			webView->page()->mainFrame()->documentElement().findFirst("body").lastChild().evaluateJavaScript("var script = document.createElement('script'); var old = document.getElementsByClassName(\"" + qstrClass + "\")[0]; old.parentNode.replaceChild(script,old); script.type = 'text/javascript'; script.innerHTML = \"" + qstrSource + "\";");
+		}
+	}*/
+	
 }
 
 void Elise::clear(IEVIEWEVENT* event) {
-	//builder->clearLastEvent();	
+	builder->clearDoc(event);	
 	if (templateInitialized) {
 		builder->initHead();
-		webView->setHtml(builder->getHead(), Options::getTemplateUrl());
+		webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
 	}
 	else
 		webView->setHtml(noTemplate, Options::getTemplateUrl());
@@ -272,10 +288,15 @@ void Elise::ReleaseEliseMessages() {
 }
 
 void QMyWebView::callWebInspector() {
-	if (!inspector) {
-		inspector = new QWebInspector();
-		inspector->setPage(this->page());
-		inspector->resize(800, 600);
-	}
-	inspector->show();
+	//if (!inspector) {
+	//	inspector = new QWebInspector();
+	//	inspector->setPage(this->page());
+	//	inspector->resize(800, 600);
+	//}
+	//inspector->show();
+	QTextEdit* view = new QTextEdit();
+    view->resize(500, 500);
+    view->setWindowTitle("HTML code");
+    view->setText(parent->getHTML());
+    view->show();
 }
