@@ -3,7 +3,7 @@
 
 class Elise;
 
-QMap<QString, QString> TemplateMap::templateMap;
+//QMap<QString, QString> TemplateMap::templateMap;
 QMap<QString, QRegExp> TemplateMap::templateBBCodes;
 
 static const int templatesNumber = 50;
@@ -61,13 +61,11 @@ static const QString templateNames[templatesNumber] = {
 	"<!--hMessageOutGroupEndRTL-->"
 };
 
-void TemplateMap::loadTemplate(const QString &fileName) {	
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		MessageBox(NULL, _T("Can not open file for reading."),_T("Error"),MB_OK);
-		Elise::setTemplateInit(false);
-		return;
-	}
+int TemplateMap::loadTemplate() {	
+	inited = false;
+	QFile file(qstrSkinPath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return 1;
 
 	QTextStream in(&file);
 
@@ -94,21 +92,22 @@ void TemplateMap::loadTemplate(const QString &fileName) {
 		tmplBuf += "\n";
 	}
 	templateMap[tmplName] = tmplBuf;
-	Elise::setTemplateInit(true);	
+	inited = true;
+	return 0;
 }
 
 
 void TemplateMap::loadBBCodes() {
 
-	templateBBCodes["b"] = QRegExp("[[]b[]](.*)[[]/b[]]", Qt::CaseInsensitive);          // bolded text
-	templateBBCodes["s"] = QRegExp("[[]s[]](.*)[[]/s[]]", Qt::CaseInsensitive);          // strikethrough text
-	templateBBCodes["i"] = QRegExp("[[]i[]](.*)[[]/i[]]", Qt::CaseInsensitive);          // italicized text
-	templateBBCodes["u"] = QRegExp("[[]u[]](.*)[[]/u[]]", Qt::CaseInsensitive);          // underlined text
-	templateBBCodes["img"] = QRegExp("[[]img[]](.*)[[]/img[]]", Qt::CaseInsensitive);    // image
-	templateBBCodes["code"] = QRegExp("[[]code[]](.*)[[]/code[]]", Qt::CaseInsensitive); // monospaced text
-	templateBBCodes["quote"] = QRegExp("[[]quote[]](.*)[[]/quote[]]", Qt::CaseInsensitive);        // quoted text
-	templateBBCodes["size"] = QRegExp("[[]size=(\\d+)[]](.*)[[]/size[]]", Qt::CaseInsensitive);    // sized text
-	templateBBCodes["color"] = QRegExp("[[]color=(.+)[]](.*)[[]/color[]]", Qt::CaseInsensitive); // colored text
+	templateBBCodes["b"] = QRegExp("[[]b[]](.*)[[]/b[]]", Qt::CaseInsensitive);				// bolded text
+	templateBBCodes["s"] = QRegExp("[[]s[]](.*)[[]/s[]]", Qt::CaseInsensitive);				// strikethrough text
+	templateBBCodes["i"] = QRegExp("[[]i[]](.*)[[]/i[]]", Qt::CaseInsensitive);				// italicized text
+	templateBBCodes["u"] = QRegExp("[[]u[]](.*)[[]/u[]]", Qt::CaseInsensitive);				// underlined text
+	templateBBCodes["img"] = QRegExp("[[]img[]](.*)[[]/img[]]", Qt::CaseInsensitive);		// image
+	templateBBCodes["code"] = QRegExp("[[]code[]](.*)[[]/code[]]", Qt::CaseInsensitive);	// monospaced text
+	templateBBCodes["quote"] = QRegExp("[[]quote[]](.*)[[]/quote[]]", Qt::CaseInsensitive);			// quoted text
+	templateBBCodes["size"] = QRegExp("[[]size=(\\d+)[]](.*)[[]/size[]]", Qt::CaseInsensitive);		// sized text
+	templateBBCodes["color"] = QRegExp("[[]color=(.+)[]](.*)[[]/color[]]", Qt::CaseInsensitive);	// colored text
 
 	templateBBCodes["b"].setMinimal(true);
 	templateBBCodes["s"].setMinimal(true);
@@ -119,5 +118,55 @@ void TemplateMap::loadBBCodes() {
 	templateBBCodes["quote"].setMinimal(true);
 	templateBBCodes["size"].setMinimal(true);
 	templateBBCodes["color"].setMinimal(true);
+}
+
+QString* TemplateMap::getTemplatePath() {	
+	return &qstrSkinPath;
+}
+
+QString TemplateMap::getRealTemplatePath() {	
+	return qstrSkinPath;
+}
+
+QUrl TemplateMap::getTemplateUrl() {
+	return qurlSkinPath;
+}
+
+void TemplateMap::setTemplatePath(wchar_t pszPath[MAX_PATH])
+{
+	wchar_t pszPath2[MAX_PATH];
+	CallService(MS_UTILS_PATHTOABSOLUTEW, (WPARAM)pszPath, (LPARAM)pszPath2);
+	qstrSkinPath = QString::fromWCharArray(pszPath2);
+	qurlSkinPath = QUrl::fromLocalFile(qstrSkinPath);
+}
+
+void TemplateMap::setTemplatePath(QString* path)
+{
+	qstrSkinPath = *path;
+	qurlSkinPath = QUrl::fromLocalFile(qstrSkinPath);
+}
+
+bool TemplateMap::isTemplateInited()
+{
+	return inited;
+}
+
+TemplateMap::TemplateMap()
+{
+	inited = false;
+	qurlSkinPath = cqurlNotSet;
+	qstrSkinPath = cqstrNotSet;
+}
+
+TemplateMap::TemplateMap(TemplateMap* other)
+{
+	inited = other->inited;
+	setTemplatePath(other->getTemplatePath());
+	templateMap = other->templateMap;
+}
+
+TemplateMap::~TemplateMap()
+{
+
 }
 

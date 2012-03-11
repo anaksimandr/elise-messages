@@ -42,10 +42,7 @@ private:
 
 	IEVIEWEVENT		lastIEViewEvent;
 	time_t			startedTime;
-	char*			getProto(HANDLE hContact);
-	char*			getProto(const char* proto, HANDLE hContact);
 	char*			timestampToString(DWORD dwFlags, time_t check, int mode);
-	HANDLE			getRealContact(HANDLE hContact);
 	void			getUINs(HANDLE hContact, QString& uinIn, QString& uinOut);
 	void			getAvatar(HANDLE hContact, const char* szProto, QString& result);
 	void			replaceBBCodes(QString& text);

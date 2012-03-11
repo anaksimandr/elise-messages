@@ -14,14 +14,14 @@ Elise Messages Plugin for Miranda IM
 Elise* Elise::list = NULL;
 CRITICAL_SECTION Elise::mutex;
 bool Elise::isInited = false;
-bool Elise::templateInitialized = false;
+//bool Elise::templateInitialized = false;
 
 // эта хрень пока повисит тут, т.к. опций нет
 // путь задается относительно miranda.exe
 // moved to Options::skinPath
 //QString skinPath("Skins/IEView/testSkin/myskin.ivt");
 //QUrl skinDir = QUrl(QDir::currentPath() + "/" + skinPath);
-QString noTemplate = "Go to options";
+QString noTemplate = "Go to the options";
 
 Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 
@@ -48,13 +48,15 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy) {
 	webView->settings()->setMaximumPagesInCache(0);
 	//webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
-	if (templateInitialized) {
-		builder->initHead();
-		webView->setHtml(builder->getHead(), Options::getTemplateUrl());
-		//isHeaderSet = true;
+	TemplateMap* templ = Options::isTemplateInited(hContact);
+
+	if (templ->isTemplateInited()) {
+	//	builder->initHead();
+	//	webView->setHtml(builder->getHead(), Options::getTemplateUrl());
+	//	//isHeaderSet = true;
 	}
 	else {
-		webView->setHtml(noTemplate, Options::getTemplateUrl());
+		webView->setHtml(noTemplate, cqstrNotSet);
 		//isHeaderSet = false;
 	}
 	//webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(" ");
@@ -148,7 +150,7 @@ void Elise::scrollToBottom() {
 }
 
 void Elise::appendEvent(IEVIEWEVENT* event) {
-	if (templateInitialized) {
+	if (Options::isTemplateInited(hContact)) {
 		if (event->eventData == NULL) {return; }
 		builder->appendEventNew(this, event);
 		//webView->setHtml(builder->getDocument(), Options::getTemplateUrl());
@@ -158,7 +160,7 @@ void Elise::appendEvent(IEVIEWEVENT* event) {
 }
 
 void Elise::appendEventOld(IEVIEWEVENT* event) {
-	if (templateInitialized) {
+	if (Options::isTemplateInited(hContact)) {
 		//if (event->eventData == NULL) {return; }
 		//builder->setDocument(webView->page()->mainFrame()->toHtml());
 		//bufView->setHtml(builder->getHead(), Options::getTemplateUrl());			
@@ -184,7 +186,9 @@ void Elise::appendEventOld(IEVIEWEVENT* event) {
 
 void Elise::reloadDoc() {
 	//webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
-	webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
+	TemplateMap* templ = Options::isTemplateInited(hContact);
+	if (templ->isTemplateInited())
+		webView->setHtml(builder->getHistory(), templ->getTemplateUrl());
 	//builder->setDocument(webView->page()->mainFrame()->toHtml());
 }
 
@@ -228,13 +232,14 @@ void Elise::addToDoc() {
 }
 
 void Elise::clear(IEVIEWEVENT* event) {
-	builder->clearDoc(event);	
-	if (templateInitialized) {
+	builder->clearDoc(event);
+	TemplateMap* templ = Options::isTemplateInited(hContact);
+	if (templ->isTemplateInited()) {
 		builder->initHead();
-		webView->setHtml(builder->getHistory(), Options::getTemplateUrl());
+		webView->setHtml(builder->getHistory(), templ->getTemplateUrl());
 	}
 	else
-		webView->setHtml(noTemplate, Options::getTemplateUrl());
+		webView->setHtml(noTemplate, cqstrNotSet);
 }
 
 int Elise::getSelection(IEVIEWEVENT* event) {
@@ -251,9 +256,9 @@ void Elise::linkClicked(QUrl url) {
 	QDesktopServices::openUrl(url);
 }
 
-void Elise::setTemplateInit(bool isInit) {
-	templateInitialized = isInit;
-}
+//void Elise::setTemplateInit(bool isInit) {
+//	templateInitialized = isInit;
+//}
 
 int Elise::InitEliseMessages(void)
 {
@@ -261,9 +266,8 @@ int Elise::InitEliseMessages(void)
 	isInited = true;
 	InitializeCriticalSection(&mutex);	
 
-	if (Options::initOptions()) {		
-		TemplateMap::loadTemplate(Options::getRealTemplatePath());		
-	}
+	Options::initOptions();
+
 	TemplateMap::loadBBCodes();
 
 	Utils::hookEvent_Ex(ME_OPT_INITIALISE, Options::initOptionsPage);

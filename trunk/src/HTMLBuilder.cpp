@@ -98,9 +98,9 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 	QString qsTime;
 	QString qsDate;
 
-	hRealContact = getRealContact(event->hContact);
-	szRealProto = getProto(hRealContact);
-	szProto = getProto(event->pszProto, event->hContact);
+	hRealContact = Options::getRealContact(event->hContact);
+	szRealProto = Options::getProto(hRealContact);
+	szProto = Options::getProto(event->pszProto, event->hContact);
 
 	// вот тут в ieview создают карту шаблона..при каждом полученном сообщении? втф?
 
@@ -177,11 +177,13 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			if (isSent) {
 				qsAvatar = qsAvatarOut;
 				qsUIN = qsUINOut;
-				lastEvent = TemplateMap::templateMap["<!--MessageOut-->"];
+				//lastEvent = TemplateMap::templateMap["<!--MessageOut-->"];
+				lastEvent = "trololo";
 			} else {
 				qsAvatar = qsAvatarIn;
 				qsUIN = qsUINIn;
-				lastEvent = TemplateMap::templateMap["<!--MessageIn-->"];
+				//lastEvent = TemplateMap::templateMap["<!--MessageIn-->"];
+				lastEvent = "trololo2";
 			}
 
 			//qsTime = QString::fromAscii(timestampToString(getFlags(protoSettings), eventData->time, 1));
@@ -201,7 +203,8 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			replaceSmileys(qsText,isSent, event->hContact, szProto);
 
 			// final step of making message
-			lastEvent.replace("%base%", Options::getRealTemplatePath());  // base URL
+			TemplateMap* templ = Options::isTemplateInited(event->hContact);
+			lastEvent.replace("%base%", templ->getRealTemplatePath());  // base URL
 			lastEvent.replace("%name%", qsName);          // contact's name or user's name (depends on context)
 			lastEvent.replace("%time%", qsTime);          // event's time
 			lastEvent.replace("%date%", qsDate);          // event's date
@@ -248,7 +251,7 @@ void HTMLBuilder::appendEventOld(Elise* view, IEVIEWEVENT* event) {
 	if (event->cbSize >= IEVIEWEVENT_SIZE_V3 && event->pszProto != NULL) {
 		szProto = Utils::dupString(event->pszProto);
 	} else {
-		szProto = getProto(event->hContact);
+		szProto = Options::getProto(event->hContact);
 	}
 	newEvent.pszProto = szProto;
 	newEvent.count = 0;
@@ -429,23 +432,18 @@ wchar_t* HTMLBuilder::getContactName(HANDLE hContact, const char* szProto) {
 	return Utils::dupString(TranslateT("(Unknown Contact)"));
 }
 
-char* HTMLBuilder::getProto(HANDLE hContact) {
-	return Utils::dupString((char*)CallService(MS_PROTO_GETCONTACTBASEPROTO, (WPARAM) hContact, 0));
-}
+void HTMLBuilder::getUINs(HANDLE hContact, QString& uinIn, QString& uinOut)
+{
+	char* szUINIn = NULL;
+	char* szUINOut = NULL;
 
-char* HTMLBuilder::getProto(const char *proto, HANDLE hContact) {
-	if (proto != NULL) {
-		return Utils::dupString(proto);
-	}
-	return Utils::dupString((char *)CallService(MS_PROTO_GETCONTACTBASEPROTO, (WPARAM) hContact, 0));
-}
+	Options::getUINs(hContact, szUINIn, szUINOut);
 
-HANDLE HTMLBuilder::getRealContact(HANDLE hContact) {
-	char *szProto = (char *)CallService(MS_PROTO_GETCONTACTBASEPROTO, (WPARAM) hContact, 0);
-	if (szProto != NULL && !strcmp(szProto,"MetaContacts")) {
-		hContact = (HANDLE) CallService(MS_MC_GETMOSTONLINECONTACT, (WPARAM) hContact, 0);
-	}
-	return hContact;
+	uinIn = QString::fromAscii(szUINIn);
+	uinOut = QString::fromAscii(szUINOut);
+
+	if (szUINIn!=NULL) delete szUINIn;
+	if (szUINOut!=NULL) delete szUINOut;
 }
 
 // TODO привести в божеский вид
@@ -647,7 +645,7 @@ void HTMLBuilder::setLastIEViewEvent(IEVIEWEVENT* event) {
 	if (event->cbSize >= IEVIEWEVENT_SIZE_V3 && event->pszProto != NULL) {
 		lastIEViewEvent.pszProto = Utils::dupString(event->pszProto);
 	} else {
-		lastIEViewEvent.pszProto = getProto(event->hContact);
+		lastIEViewEvent.pszProto = Options::getProto(event->hContact);
 	}
 }
 
@@ -680,8 +678,10 @@ time_t HTMLBuilder::getStartedTime() {
 }
 
 void HTMLBuilder::initHead() {
-	header = TemplateMap::templateMap["<!--HTMLStart-->"];
-	footer = TemplateMap::templateMap["<!--HTMLEnd-->"];
+	//header = TemplateMap::templateMap["<!--HTMLStart-->"];
+	//footer = TemplateMap::templateMap["<!--HTMLEnd-->"];
+	header = "trololo3";
+	footer = "trololo4";
 }
 
 QString HTMLBuilder::getLastEvent() {
@@ -714,50 +714,6 @@ void HTMLBuilder::clearDoc(IEVIEWEVENT* event) {
 //void HTMLBuilder::addToDoc() {
 //	parentView->addToDoc(lastEvent);
 //}
-
-void HTMLBuilder::getUINs(HANDLE hContact, QString& uinIn, QString& uinOut) {
-	// взято в ieview, как и многое остальное.
-	CONTACTINFO ci;
-	char buf[128];
-	char* szProto;
-	hContact = getRealContact(hContact);
-	szProto = getProto(hContact);
-	ZeroMemory(&ci, sizeof(ci));
-	ci.cbSize = sizeof(ci);
-	ci.hContact = hContact;
-	ci.szProto = szProto;
-	ci.dwFlag = CNF_UNIQUEID;
-	buf[0] = 0;
-	if (!CallService(MS_CONTACT_GETCONTACTINFO, 0, (LPARAM) & ci)) {
-		switch (ci.type) {
-		case CNFT_ASCIIZ:
-			mir_snprintf(buf, sizeof(buf), "%s", ci.pszVal);
-			miranda_sys_free(ci.pszVal);
-			break;
-		case CNFT_DWORD:
-			mir_snprintf(buf, sizeof(buf), "%u", ci.dVal);
-			break;
-		}
-	}
-	uinIn = QString::fromUtf8(buf);
-
-	ci.hContact = NULL;
-	buf[0] = 0;
-	if (!CallService(MS_CONTACT_GETCONTACTINFO, 0, (LPARAM) & ci)) {
-		switch (ci.type) {
-		case CNFT_ASCIIZ:
-			mir_snprintf(buf, sizeof(buf), "%s", ci.pszVal);
-			miranda_sys_free(ci.pszVal);
-			break;
-		case CNFT_DWORD:
-			mir_snprintf(buf, sizeof(buf), "%u", ci.dVal);
-			break;
-		}
-	}
-	uinOut = QString::fromUtf8(buf);
-
-	delete szProto;
-}
 
 int HTMLBuilder::getLastEventType() {
 	return iLastEventType;

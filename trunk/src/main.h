@@ -16,6 +16,7 @@
 //#include <QWinWidget>
 //#include <CommCtrl.h>
 #include <QtCore>
+#include <QMap>
 #include <windows.h>
 #include <tchar.h>
 #include <newpluginapi.h>
@@ -30,6 +31,7 @@
 #include "m_metacontacts.h"
 #include <m_avatars.h>
 #include "m_smileyadd.h"
+#include <m_protosvc.h>
 //#include <QMessageBox>
 
 extern HINSTANCE hEliseInst;

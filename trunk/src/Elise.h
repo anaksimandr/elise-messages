@@ -39,10 +39,11 @@ private:
     static CRITICAL_SECTION mutex;
     //static HWND hElise;
     static bool		isInited;
-	static bool		templateInitialized;
+	//static bool		templateInitialized;
 	//bool			isHeaderSet;
     HWND            hwnd;
     HWND            parent;
+	HANDLE			hContact;
     Elise           *prev, *next;
     int             height;
     int             width;
@@ -69,7 +70,7 @@ public:
 	void			reloadDoc();
     void            saveDocument();
 	
-	static void		setTemplateInit(bool isInit);
+	//static void		setTemplateInit(bool isInit);
     static int      InitEliseMessages(void);
     static void     ReleaseEliseMessages(void);
 //public slots:

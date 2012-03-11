@@ -37,6 +37,7 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hinstDLL,DWORD fdwReason,LPVOID lpvRese
 {
 	// это нужно для работы гуев qt
 	ownApplication = QMfcApp::pluginInstance(hinstDLL);
+	//QTextCodec::setCodecForCStrings(QTextCodec::codecForName("windows-1251"));
 
 	hEliseInst=hinstDLL;
 	return TRUE;

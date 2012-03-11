@@ -28,6 +28,8 @@ public:
 	static wchar_t* dupString(const wchar_t* a, int l);
 	static wchar_t* convertToWCS(const char* a);
 	static wchar_t* convertToWCS(const char* a, int cp);
+	static wchar_t* newWCS(const wchar_t* a);
+	static char* convertToString(const wchar_t *a);
 	// надобность вот этих, вот, функций еще стоит проверить
 	static char* UTF8Encode(const wchar_t *wtext);
 	static char* UTF8Encode(const char *text);
