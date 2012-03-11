@@ -15,6 +15,7 @@ class Options;
 
 extern const QString cqstrNotSet;
 extern const QUrl cqurlNotSet;
+extern const unsigned char cNotSet;
 
 typedef struct {
 	unsigned char	cBBCodes;
@@ -92,6 +93,37 @@ private:
 		if (szUINIn!=NULL) delete szUINIn;
 		if (szProto!=NULL) delete szProto;
 	};
+	//-- Decode byte value
+	inline static UINT		updateCheckBox(unsigned char val)
+	{
+		switch (val) {
+			//-- cNotSet = 0
+		case (0):
+			return BST_INDETERMINATE;
+			break;
+		case (1):
+			return BST_CHECKED;
+			break;
+		case (2):
+			return BST_UNCHECKED;
+			break;
+		}
+	};
+	//-- Encode byte value
+	inline static unsigned char readCheckBox(UINT val)
+	{
+		switch (val) {
+		case (BST_INDETERMINATE):
+			return cNotSet;
+			break;
+		case (BST_CHECKED):
+			return 1;
+			break;
+		case (BST_UNCHECKED):
+			return 2;
+			break;
+		}
+	};
 public:
 	static QString*	currentTab;
 	static void		saveSettings(HWND hwnd);
@@ -111,8 +143,7 @@ public:
 	static void		buildProtocolList(HWND hwnd);
 	static void		updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH]);
 	static void		saveSingleSettings(HWND hwndDlg, QString qsProto, HANDLE hContact, SAVEOPTIONS* opt);
-	static int		loadContactSettings(HANDLE hContact);
-	static int		loadProtoSettings(char* szProto);
+	static int		loadSingleSettings(char* szProto, HANDLE hContact);
 	static int		prepareToSave(HWND hwndDlg);
 	static int		updateSettingsInMap(QString qsProto, SAVEOPTIONS* opt);
 

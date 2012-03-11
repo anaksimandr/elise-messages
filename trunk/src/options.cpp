@@ -9,12 +9,22 @@ Elise Messages Plugin for Miranda IM
 #define ELISE_DEFAULT_OPT		"_default_"
 #define ELISE_DEFAULT_OPT_N		"Default"
 #define ELISE_TEMPLATE_PATH		"templatePath"
+//-- Flags
 #define ELISE_BBCODES_ENABLE	"bbcodes"
 #define ELISE_URL_PARSE			"urlsparse"
+#define ELISE_MESSG_GROUP		"messg_group"
+#define ELISE_SHOW_NICK			"nick"
+#define ELISE_SHOW_TIME			"time"
+#define ELISE_SHOW_SEC			"seconds"
+#define ELISE_DATE_SHOW			"date"
+#define ELISE_DATE_WORD			"date_word"
+#define ELISE_DATE_RELAT		"date_relat"
+
 
 //-- Constants, which are means that the option is not set
 const QString cqstrNotSet = "NOTSET";
 const QUrl cqurlNotSet = "NOTSET";
+//-- Note: change cNotSet in inline function Options::updateCheckBox because... 
 const unsigned char cNotSet = 0;
 
 HANDLE hHookOptionsChanged;
@@ -423,7 +433,7 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 	HWND hControl;
 	wchar_t path[MAX_PATH] = L"";
 	QString qsProto;
-	UINT state;
+	//UINT state;
 
 	qsProto = QString::fromWCharArray(proto);
 
@@ -440,35 +450,42 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 			hControl = GetDlgItem(hwndDlg, IDC_TEMPLATE_PATH);
 			SetWindowTextW(hControl, current->pszPath);
 
-			//-- BBCodes
-			switch (current->cBBCodes) {
-			case (cNotSet):
-				state = BST_INDETERMINATE;
-				break;
-			case (1):
-				state = BST_CHECKED;
-				break;
-			case (2):
-				state = BST_UNCHECKED;
-				break;
-			}
+			//-- BBCodes			
 			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_BBCODES);
-			SendMessage(hControl, BM_SETCHECK, state, 0);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cBBCodes), 0);
 
-			//-- URL parsing
-			switch (current->cURLParse) {
-			case (cNotSet):
-				state = BST_INDETERMINATE;
-				break;
-			case (1):
-				state = BST_CHECKED;
-				break;
-			case (2):
-				state = BST_UNCHECKED;
-				break;
-			}
+			//-- URL parsing			
 			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_URL);
-			SendMessage(hControl, BM_SETCHECK, state, 0);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cURLParse), 0);
+
+			//-- Message grouping
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_GROUP);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cMessageGrouping), 0);
+
+			//-- Show nick
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_NICKS);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowNick), 0);
+
+			//-- Show time
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_TIME);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowTime), 0);
+
+			//-- Show seconds
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_SECONDS);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowSeconds), 0);
+
+			//-- Show date
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATE);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowDate), 0);
+
+			//-- Date word
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATEWORD);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cWordDate), 0);
+
+			//-- Relative date
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATERELAT);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cRelativeTime), 0);
+
 			return;
 		} //if
 	} //if
@@ -486,35 +503,41 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 	hControl = GetDlgItem(hwndDlg, IDC_TEMPLATE_PATH);
 	SetWindowTextW(hControl, path2);
 
-	//-- BBCodes
-	switch (curSet->isBBCodes()) {
-	case (cNotSet):
-		state = BST_INDETERMINATE;
-		break;
-	case (1):
-		state = BST_CHECKED;
-		break;
-	case (2):
-		state = BST_UNCHECKED;
-		break;
-	}
+	//-- BBCodes	
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_BBCODES);
-	SendMessage(hControl, BM_SETCHECK, state, 0);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isBBCodes()), 0);
 
-	//-- URL parsing
-	switch (curSet->isURLParse()) {
-	case (cNotSet):
-		state = BST_INDETERMINATE;
-		break;
-	case (1):
-		state = BST_CHECKED;
-		break;
-	case (2):
-		state = BST_UNCHECKED;
-		break;
-	}
+	//-- URL parsing	
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_URL);
-	SendMessage(hControl, BM_SETCHECK, state, 0);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isURLParse()), 0);
+
+	//-- Message grouping
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_GROUP);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isMessageGrouping()), 0);
+
+	//-- Show nick
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_NICKS);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowNick()), 0);
+
+	//-- Show time
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_TIME);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowTime()), 0);
+
+	//-- Show seconds
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_SECONDS);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowSeconds()), 0);
+
+	//-- Show date
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATE);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowDate()), 0);
+
+	//-- Word date
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATEWORD);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isWordDate()), 0);
+
+	//-- Relative date
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATERELAT);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isRelativeTime()), 0);
 
 }
 
@@ -522,7 +545,7 @@ int Options::prepareToSave(HWND hwndDlg)
 {
 	QString qstrProto;
 	HWND hControl;
-	unsigned char state;
+	//unsigned char state;
 
 	qstrProto = *currentTab;
 	
@@ -534,34 +557,40 @@ int Options::prepareToSave(HWND hwndDlg)
 	//MessageBoxW(NULL, current->pszPath, L"Debug - save template path", MB_OK);
 
 	//-- BBCodes
-	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_BBCODES);
-	switch (SendMessage(hControl, BM_GETCHECK, 0, 0)) {
-	case (BST_INDETERMINATE):
-		state = cNotSet;
-		break;
-	case (BST_CHECKED):
-		state = 1;
-		break;
-	case (BST_UNCHECKED):
-		state = 2;
-		break;
-	}
-	current->cBBCodes = state;
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_BBCODES);	
+	current->cBBCodes = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
 
 	//-- URL parsing
-	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_URL);
-	switch (SendMessage(hControl, BM_GETCHECK, 0, 0)) {
-	case (BST_INDETERMINATE):
-		state = cNotSet;
-		break;
-	case (BST_CHECKED):
-		state = 1;
-		break;
-	case (BST_UNCHECKED):
-		state = 2;
-		break;
-	}
-	current->cURLParse = state;
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_URL);	
+	current->cURLParse = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Message grouping
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_GROUP);	
+	current->cMessageGrouping = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Show nick
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_NICKS);	
+	current->cShowNick = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Show time
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_TIME);	
+	current->cShowTime = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Show seconds
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_SECONDS);	
+	current->cShowSeconds = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Show date
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATE);	
+	current->cShowDate = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Word date
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATEWORD);	
+	current->cWordDate = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Relative date
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATERELAT);	
+	current->cRelativeTime = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
 
 	if (settingsToSave == NULL) {
 		settingsToSave = new QMap<QString, SAVEOPTIONS*>();
@@ -625,6 +654,34 @@ void Options::saveSingleSettings(HWND hwndDlg, QString qsProto, HANDLE hContact,
 	sprintf(dbsName, "%s.%s", szProto, ELISE_URL_PARSE);
 	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cURLParse);
 
+	//-- Save message grouping
+	sprintf(dbsName, "%s.%s", szProto, ELISE_MESSG_GROUP);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cMessageGrouping);
+
+	//-- Save show nicks
+	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_NICK);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowNick);
+
+	//-- Save show time
+	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_TIME);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowTime);
+
+	//-- Save show seconds
+	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_SEC);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowSeconds);
+
+	//-- Save show date
+	sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_SHOW);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowDate);
+
+	//-- Save word date
+	sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_WORD);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cWordDate);
+
+	//-- Save relative date
+	sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_RELAT);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cRelativeTime);
+
 }
 
 int Options::updateSettingsInMap(QString qsProto, SAVEOPTIONS* opt)
@@ -648,10 +705,25 @@ int Options::updateSettingsInMap(QString qsProto, SAVEOPTIONS* opt)
 	//-- Template path
 	current->currentTemplate->setTemplatePath(opt->pszPath);
 
+	TemplateMap* templ = current->currentTemplate;
+
+	//-- Try to load template
+	//if (!templ->getTemplatePath()->isEmpty())
+	//-- Load
+	if (templ->loadTemplate()) {
+		//-- If loading fails for the default protocol
+		if (qsProto == QString::fromAscii(ELISE_DEFAULT_OPT)) {
+			QMessageBox qmes;
+			qmes.setText("Loading default template fails.\nCan not open file for reading.\n" + templ->getRealTemplatePath());
+			qmes.setWindowTitle("Elise messages - error");
+			qmes.exec();
+		}
+	}
+
 	return 0;
 }
 
-int Options::loadProtoSettings(char* szProto)
+int Options::loadSingleSettings(char* szProto, HANDLE hContact)
 {
 	DBVARIANT dbv={0};
 	wchar_t pszPath[MAX_PATH];	//-- Used to get template path from db
@@ -662,7 +734,7 @@ int Options::loadProtoSettings(char* szProto)
 
 	//-- Path to template
 	sprintf(dbsName, "%s.%s", szProto, ELISE_TEMPLATE_PATH);
-	DBGetContactSettingTString(NULL,  eliseModuleName, dbsName, &dbv);
+	DBGetContactSettingTString(hContact,  eliseModuleName, dbsName, &dbv);
 
 	if (lstrcmp(dbv.ptszVal, NULL) == 0) {
 		DBFreeVariant(&dbv);
@@ -671,29 +743,41 @@ int Options::loadProtoSettings(char* szProto)
 		QString ttmp = cqstrNotSet;
 		newOpt->currentTemplate->setTemplatePath(&ttmp);
 
-		//-- Default options can't have BST_INDETERMINATE value
+		//-- Default value
+		unsigned char defVal = cNotSet;
+
+		//-- Default options can't have BST_INDETERMINATE value (cNotSet)
 		if (!strcmp(szProto, ELISE_DEFAULT_OPT)) {
-			newOpt->setBBcodes(2);	//-- Note: "2" is disable
-			newOpt->setURLParse(2);
+			defVal = 2;			//-- Note: "2" is disable
 		}
-		else {
-			newOpt->setBBcodes(cNotSet);
-			newOpt->setURLParse(cNotSet);
-		}
+		
+		newOpt->setBBcodes(defVal);
+		newOpt->setURLParse(defVal);
+		newOpt->setMessageGrouping(defVal);
+		newOpt->setShowNick(defVal);
+		newOpt->setShowTime(defVal);
+		newOpt->setShowSeconds(defVal);
+		newOpt->setShowDate(defVal);
+		newOpt->setWordDate(defVal);
+		newOpt->setRelativeTime(defVal);
 	}
 	else {
 		//-- If settings was found then load it
+		
+		//-- Path to template
 		CallService(MS_UTILS_PATHTOABSOLUTEW, (WPARAM)dbv.ptszVal, (LPARAM)pszPath);
 		newOpt->currentTemplate->setTemplatePath(pszPath);
 		DBFreeVariant(&dbv);
 
+		//-- Default value
 		unsigned char defVal = cNotSet;
+		//-- Default options can't have BST_INDETERMINATE value (cNotSet)
 		if (!strcmp(szProto, ELISE_DEFAULT_OPT))
 			defVal = 2;
 
 		//-- BBCodes
 		sprintf(dbsName, "%s.%s", szProto, ELISE_BBCODES_ENABLE);
-		dbResult = DBGetContactSettingByte(NULL, eliseModuleName, dbsName, -1);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
 		if (dbResult != -1)
 			newOpt->setBBcodes(dbResult);
 		else
@@ -701,11 +785,68 @@ int Options::loadProtoSettings(char* szProto)
 
 		//-- URL parsing
 		sprintf(dbsName, "%s.%s", szProto, ELISE_URL_PARSE);
-		dbResult = DBGetContactSettingByte(NULL, eliseModuleName, dbsName, -1);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
 		if (dbResult != -1)
 			newOpt->setURLParse(dbResult);
 		else
 			newOpt->setURLParse(defVal);
+
+		//-- Message grouping
+		sprintf(dbsName, "%s.%s", szProto, ELISE_MESSG_GROUP);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setMessageGrouping(dbResult);
+		else
+			newOpt->setMessageGrouping(defVal);
+
+		//-- Show nick
+		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_NICK);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setShowNick(dbResult);
+		else
+			newOpt->setShowNick(defVal);
+
+		//-- Show time
+		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_TIME);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setShowTime(dbResult);
+		else
+			newOpt->setShowTime(defVal);
+
+		//-- Show seconds
+		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_SEC);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setShowSeconds(dbResult);
+		else
+			newOpt->setShowSeconds(defVal);
+
+		//-- Show date
+		sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_SHOW);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setShowDate(dbResult);
+		else
+			newOpt->setShowDate(defVal);
+
+		//-- Word date
+		sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_WORD);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setWordDate(dbResult);
+		else
+			newOpt->setWordDate(defVal);
+
+		//-- Relative date
+		sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_RELAT);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setRelativeTime(dbResult);
+		else
+			newOpt->setRelativeTime(defVal);
+
 
 		TemplateMap* templ = newOpt->currentTemplate;
 
@@ -718,7 +859,7 @@ int Options::loadProtoSettings(char* szProto)
 					//-- If path is not NOTSET
 					if (templ->getRealTemplatePath() != cqstrNotSet) {
 						QMessageBox qmes;
-						qmes.setText("Loading default template fails.\nCan not open file for reading.");
+						qmes.setText("Loading default template fails.\nCan not open file for reading.\n" + templ->getRealTemplatePath());
 						qmes.setWindowTitle("Elise messages - error");
 						qmes.exec();
 					}
@@ -727,87 +868,6 @@ int Options::loadProtoSettings(char* szProto)
 	//-- Adding options to map
 	QString tmp = QString::fromAscii(szProto);
 	settings.insert(tmp, newOpt);
-
-	return 0;
-}
-
-int Options::loadContactSettings(HANDLE hContact)
-{
-	/*//wchar_t* Utils::convertToWCS(const char* a)
-	
-	DBVARIANT dbv={0};	
-	wchar_t pszPath[MAX_PATH];	//-- Used to get template path from db
-	char dbsName[256];			//-- tmp string, used in calls of DBGetContactSettingByte
-	char* szProto = NULL;		//-- Storing protocol name or contact identifier
-	bool writeIt = false;		//-- Add settings to map or not
-	unsigned char dbResult;		//-- Results of DBGetContactSettingByte
-
-	//-- Define contact's proto
-	if (hContact == NULL)
-		szProto = ELISE_DEFAULT_OPT;
-	else
-		szProto = Utils::dupString((char*)CallService(MS_PROTO_GETCONTACTBASEPROTO, (WPARAM) hContact, 0));
-
-	SingleOptions* newOpt;
-
-	//-- First, load the protocol settings if this was not done before
-	if (!settings.contains(szProto)) {
-
-		newOpt = new SingleOptions();
-
-		//-- Path to template
-		sprintf(dbsName, "%s.%s", szProto, ELISE_TEMPLATE_PATH);
-		DBGetContactSettingTString(NULL,  eliseModuleName, dbsName, &dbv);
-		if (lstrcmp(dbv.ptszVal, NULL) == 0) {
-			DBFreeVariant(&dbv);
-		}
-		else {
-			CallService(MS_UTILS_PATHTOABSOLUTEW, (WPARAM)dbv.ptszVal, (LPARAM)pszPath);
-			newOpt->setTemplatePath(pszPath);
-			writeIt = true;
-		}
-
-		//-- BBCodes
-		sprintf(dbsName, "%s.%s", szProto, ELISE_BBCODES_ENABLE);
-		if (dbResult = DBGetContactSettingByte(NULL, eliseModuleName, dbsName, -1) != -1) {
-			newOpt->setBBcodes(dbResult);
-			writeIt = true;
-		}
-		//-- URL parsing
-		sprintf(dbsName, "%s.%s", szProto, ELISE_URL_PARSE);
-		if (dbResult = DBGetContactSettingByte(NULL, eliseModuleName, dbsName, -1) != -1) {
-			newOpt->setURLParse(dbResult);
-			writeIt = true;
-		}
-
-		QMessageBox qmes;
-		qmes.setText(newOpt->getRealTemplatePath());
-		qmes.exec();
-
-		//-- If template path is empty mark as uninitialised
-		if (!newOpt->getTemplatePath()->isEmpty()) 
-			//-- If loadTemplate fails mark as uninitialised
-			if (!newOpt->currentTemplate->loadTemplate(newOpt->getRealTemplatePath()))
-				if (hContact == NULL)
-					templateInited = true;
-
-		//-- Adding options to map
-		if (writeIt)
-			settings.insert(szProto, newOpt);
-		else
-			newOpt->~SingleOptions();
-
-	} //if
-
-	//-- Now, load personal contact settings. Not needed for default settings.
-	if (hContact == NULL) {
-		//delete szProto;
-		return 0;
-	}
-
-	//Coming soon
-
-	//delete szProto;*/
 
 	return 0;
 }
@@ -1037,7 +1097,7 @@ int Options::initOptions()
 	
 	for (int i = 0; i < protoCount+1; i++) {
 		if (i==0) {
-			loadProtoSettings(ELISE_DEFAULT_OPT);
+			loadSingleSettings(ELISE_DEFAULT_OPT, NULL);
 		}
 		else {
 			if ((pProtos[i-1]->type == PROTOTYPE_PROTOCOL) && strcmp(pProtos[i-1]->szName,"MetaContacts")) {
@@ -1046,7 +1106,7 @@ int Options::initOptions()
 				//	//continue;
 				//}
 				//MessageBoxA(NULL, pProtos[i-1]->szName, "Debug", MB_OK);
-				loadProtoSettings(pProtos[i-1]->szName);
+				loadSingleSettings(pProtos[i-1]->szName, NULL);
 			}
 			else
 				continue;
@@ -1076,38 +1136,6 @@ int Options::initOptionsPage(WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
-/*
-int Options::initDefaultSettings()
-{
-	char dbsName[256];
-
-	//-- Check default options by path to template
-	sprintf(dbsName, "%s.%s", ELISE_DEFAULT_OPT, ELISE_TEMPLATE_PATH);
-	DBGetContactSettingTString(NULL,  eliseModuleName, dbsName, &dbv);	
-	//-- If no default settings found then create it
-	if (lstrcmp(dbv.ptszVal, NULL) == 0) {	
-		
-		//-- path to template
-		wchar_t pszPath[MAX_PATH];
-		cqstrNotSet.toWCharArray(pszPath);
-		//Debug
-		MessageBoxW(NULL, pszPath, L"Debug initDefaultSettings", MB_OK);
-		DBWriteContactSettingTString(NULL, eliseModuleName, dbsName, pszPath);
-
-		//-- BBCodes
-		sprintf(dbsName, "%s.%s", ELISE_DEFAULT_OPT, ELISE_BBCODES_ENABLE);
-		DBWriteContactSettingByte(NULL, eliseModuleName, dbsName, 2);		//-- Note: "2" is disabled
-		
-		//-- URL parsing
-		sprintf(dbsName, "%s.%s", ELISE_DEFAULT_OPT, ELISE_URL_PARSE);
-		DBWriteContactSettingByte(NULL, eliseModuleName, dbsName, 2);
-
-	}
-
-	DBFreeVariant(&dbv);
-
-	return 0;
-}*/
 
 //-- class Options --///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
