@@ -5,6 +5,7 @@ Elise Messages Plugin for Miranda IM
 
 class TemplateMap;
 class Options;
+class SingleOptions;
 
 #ifndef OPTIONS_H
 #define OPTIONS_H
@@ -21,7 +22,7 @@ typedef struct {
 	unsigned char	cBBCodes;
 	unsigned char	cURLParse;
 	unsigned char	cMessageGrouping;
-	unsigned char	cShowNick;
+	unsigned char	cShowAvatar;
 	unsigned char	cShowTime;
 	unsigned char	cShowSeconds;
 	unsigned char	cShowDate;
@@ -35,13 +36,13 @@ typedef struct {
 class SingleOptions {
 private:
 	
-	//-- Note:	0 is not set (use cNotSet constant)
+	//-- Note:	0 is disabled
 	//--		1 is enabled
-	//--		2 is disabled
+	//--		2 is not set (use cNotSet constant)
 	unsigned char	cBBCodes;
 	unsigned char	cURLParse;
 	unsigned char	cMessageGrouping;
-	unsigned char	cShowNick;
+	unsigned char	cShowAvatar;
 	unsigned char	cShowTime;
 	unsigned char	cShowSeconds;
 	unsigned char	cShowDate;
@@ -49,15 +50,17 @@ private:
 	unsigned char	cRelativeTime;
 public:
 	TemplateMap*	currentTemplate;
-					SingleOptions();
-					SingleOptions(SingleOptions* other);
-					~SingleOptions();
+
+	SingleOptions();
+	SingleOptions(SingleOptions* other);
+	SingleOptions::SingleOptions(HANDLE hContact);
+	~SingleOptions();
 
 	//-- Getters
 	inline unsigned char	isBBCodes() {return cBBCodes;};
 	inline unsigned char	isURLParse() {return cURLParse;};
 	inline unsigned char	isMessageGrouping() {return cMessageGrouping;};
-	inline unsigned char	isShowNick() {return cShowNick;};
+	inline unsigned char	isShowAvatar() {return cShowAvatar;};
 	inline unsigned char	isShowTime() {return cShowTime;};
 	inline unsigned char	isShowSeconds() {return cShowSeconds;};
 	inline unsigned char	isShowDate() {return cShowDate;};
@@ -68,7 +71,7 @@ public:
 	inline void			setBBcodes(unsigned char val) {cBBCodes = val;};
 	inline void			setURLParse(unsigned char val) {cURLParse = val;};
 	inline void			setMessageGrouping(unsigned char val) {cMessageGrouping = val;};
-	inline void			setShowNick(unsigned char val) {cShowNick = val;};
+	inline void			setShowAvatar(unsigned char val) {cShowAvatar = val;};
 	inline void			setShowTime(unsigned char val) {cShowTime = val;};
 	inline void			setShowSeconds(unsigned char val) {cShowSeconds = val;};
 	inline void			setShowDate(unsigned char val) {cShowDate = val;};
@@ -96,16 +99,18 @@ private:
 	//-- Decode byte value
 	inline static UINT		updateCheckBox(unsigned char val)
 	{
-		switch (val) {
-			//-- cNotSet = 0
-		case (0):
+		switch (val) {			
+		case (2):   //-- cNotSet = 0
 			return BST_INDETERMINATE;
 			break;
 		case (1):
 			return BST_CHECKED;
 			break;
-		case (2):
+		case (0):
 			return BST_UNCHECKED;
+			break;
+		default:
+			return BST_INDETERMINATE;
 			break;
 		}
 	};
@@ -120,7 +125,10 @@ private:
 			return 1;
 			break;
 		case (BST_UNCHECKED):
-			return 2;
+			return 0;
+			break;
+		default:
+			return cNotSet;
 			break;
 		}
 	};
@@ -155,7 +163,7 @@ public:
 	static unsigned char	isBBCodes(HANDLE hContact);
 	static unsigned char	isURLParse(HANDLE hContact);
 	static unsigned char	isMessageGrouping(HANDLE hContact);
-	static unsigned char	isShowNick(HANDLE hContact);
+	static unsigned char	isShowAvatar(HANDLE hContact);
 	static unsigned char	isShowTime(HANDLE hContact);
 	static unsigned char	isShowSeconds(HANDLE hContact);
 	static unsigned char	isShowDate(HANDLE hContact);

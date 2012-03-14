@@ -17,7 +17,9 @@ class TemplateMap {
 private:
 	QUrl			qurlSkinPath;
 	QString			qstrSkinPath;
-	bool	inited;
+	bool			inited;
+	bool			filesInOut;
+	bool			urlInOut;
 public:
 	TemplateMap();
 	TemplateMap(TemplateMap* other);
@@ -30,7 +32,10 @@ public:
 	void			setTemplatePath(QString* path);
 	void			setTemplatePath(wchar_t pszPath[MAX_PATH]);
 
-	bool			isTemplateInited();
+	bool			isTemplateInited() {return inited;};
+	//bool			isGroupsSup() {return groupsSupported;};
+	bool			isFilesInOut() {return filesInOut;};
+	bool			isURLInOut() {return urlInOut;};
 
 	QMap<QString, QString> templateMap;
 	int				loadTemplate();

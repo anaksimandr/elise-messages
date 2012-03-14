@@ -63,6 +63,9 @@ static const QString templateNames[templatesNumber] = {
 
 int TemplateMap::loadTemplate() {	
 	inited = false;
+	//groupsSupported = false;
+	filesInOut = false;
+	urlInOut = false;
 	QFile file(qstrSkinPath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return 1;
@@ -93,6 +96,37 @@ int TemplateMap::loadTemplate() {
 	}
 	templateMap[tmplName] = tmplBuf;
 	inited = true;
+
+	//-- Now chech group support
+	/*if (templateMap.contains("<!--MessageInGroupStart-->"))
+	if (templateMap.contains("<!--MessageInGroupStart-->"))
+	if (templateMap.contains("<!--MessageInGroupInner-->"))
+	if (templateMap.contains("<!--MessageInGroupEnd-->"))
+	if (templateMap.contains("<!--hMessageInGroupStart-->"))
+	if (templateMap.contains("<!--hMessageInGroupInner-->"))
+	if (templateMap.contains("<!--hMessageInGroupEnd-->"))
+	if (templateMap.contains("<!--MessageOutGroupStart-->"))
+	if (templateMap.contains("<!--MessageOutGroupInner-->"))
+	if (templateMap.contains("<!--MessageOutGroupEnd-->"))
+	if (templateMap.contains("<!--hMessageOutGroupStart-->"))
+	if (templateMap.contains("<!--hMessageOutGroupInner-->"))
+	if (templateMap.contains("<!--hMessageOutGroupEnd-->"))
+		groupsSupported = true;*/
+
+	//-- Check file in/out support
+	if (templateMap.contains("<!--FileIn-->"))
+	if (templateMap.contains("<!--hFileIn-->"))
+	if (templateMap.contains("<!--FileOut-->"))
+	if (templateMap.contains("<!--hFileOut-->"))
+		filesInOut = true;
+
+	//-- Check URL in/out support
+	if (templateMap.contains("<!--URLIn-->"))
+	if (templateMap.contains("<!--hURLIn-->"))
+	if (templateMap.contains("<!--URLOut-->"))
+	if (templateMap.contains("<!--hURLOut-->"))
+		urlInOut = true;
+
 	return 0;
 }
 
@@ -146,14 +180,11 @@ void TemplateMap::setTemplatePath(QString* path)
 	qurlSkinPath = QUrl::fromLocalFile(qstrSkinPath);
 }
 
-bool TemplateMap::isTemplateInited()
-{
-	return inited;
-}
-
 TemplateMap::TemplateMap()
 {
 	inited = false;
+	filesInOut = false;
+	urlInOut = false;
 	qurlSkinPath = cqurlNotSet;
 	qstrSkinPath = cqstrNotSet;
 }
@@ -161,6 +192,8 @@ TemplateMap::TemplateMap()
 TemplateMap::TemplateMap(TemplateMap* other)
 {
 	inited = other->inited;
+	filesInOut = other->isFilesInOut();
+	urlInOut = other->isURLInOut();
 	setTemplatePath(other->getTemplatePath());
 	templateMap = other->templateMap;
 }

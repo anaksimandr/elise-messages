@@ -10,7 +10,7 @@ Elise Messages Plugin for Miranda IM
 int HandleEliseWindow(WPARAM wParam, LPARAM lParam) {
 	IEVIEWWINDOW *window = (IEVIEWWINDOW *) lParam;
 	if (window->iType == IEW_CREATE) {
-		Elise * view = new Elise(window->parent, window->x, window->y, window->cx, window->cy);
+		Elise * view = new Elise(window->parent, window->x, window->y, window->cx, window->cy, true);
 		window->hwnd = view->getHWND();
 	}
 	else if (window->iType == IEW_SETPOS) {

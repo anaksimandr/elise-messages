@@ -14,6 +14,7 @@ Elise Messages Plugin for Miranda IM
 #define ELISE_URL_PARSE			"urlsparse"
 #define ELISE_MESSG_GROUP		"messg_group"
 #define ELISE_SHOW_NICK			"nick"
+#define ELISE_SHOW_AVATAR		"avatar"
 #define ELISE_SHOW_TIME			"time"
 #define ELISE_SHOW_SEC			"seconds"
 #define ELISE_DATE_SHOW			"date"
@@ -24,8 +25,8 @@ Elise Messages Plugin for Miranda IM
 //-- Constants, which are means that the option is not set
 const QString cqstrNotSet = "NOTSET";
 const QUrl cqurlNotSet = "NOTSET";
-//-- Note: change cNotSet in inline function Options::updateCheckBox because... 
-const unsigned char cNotSet = 0;
+//-- Note: change cNotSet in inline function Options::updateCheckBox because... and in comments of class SingleOptions
+const unsigned char cNotSet = 2;
 
 HANDLE hHookOptionsChanged;
 QMap<QString, SingleOptions*>	Options::settings;
@@ -135,7 +136,7 @@ INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lP
 			case IDC_CHECKBOX_BBCODES:
 			case IDC_CHECKBOX_URL:
 			case IDC_CHECKBOX_GROUP:
-			case IDC_CHECKBOX_NICKS:
+			case IDC_CHECKBOX_AVATARS:
 			case IDC_CHECKBOX_TIME:
 			case IDC_CHECKBOX_SECONDS:
 			case IDC_CHECKBOX_DATE:
@@ -213,7 +214,7 @@ SingleOptions::SingleOptions()
 	cBBCodes = cNotSet;
 	cURLParse = cNotSet;
 	cMessageGrouping = cNotSet;
-	cShowNick = cNotSet;
+	cShowAvatar = cNotSet;
 	cShowTime = cNotSet;
 	cShowSeconds = cNotSet;
 	cShowDate = cNotSet;
@@ -228,17 +229,34 @@ SingleOptions::SingleOptions(SingleOptions* other)
 	cBBCodes = other->isBBCodes();
 	cURLParse = other->isURLParse();
 	cMessageGrouping = other->isMessageGrouping();
-	cShowNick = other->isShowNick();
+	cShowAvatar = other->isShowAvatar();
 	cShowTime = other->isShowTime();
 	cShowSeconds = other->isShowSeconds();
 	cShowDate = other->isShowDate();
 	cWordDate = other->isWordDate();
 	cRelativeTime = other->isRelativeTime();
+
+}
+
+SingleOptions::SingleOptions(HANDLE hContact)
+{
+	currentTemplate = Options::isTemplateInited(hContact);
+
+	cBBCodes = Options::isBBCodes(hContact);
+	cURLParse = Options::isURLParse(hContact);
+	cMessageGrouping = Options::isMessageGrouping(hContact);
+	cShowAvatar = Options::isShowAvatar(hContact);
+	cShowTime = Options::isShowTime(hContact);
+	cShowSeconds = Options::isShowSeconds(hContact);
+	cShowDate = Options::isShowDate(hContact);
+	cWordDate = Options::isWordDate(hContact);
+	cRelativeTime = Options::isRelativeTime(hContact);
+
 }
 
 SingleOptions::~SingleOptions()
 {
-	currentTemplate->~TemplateMap();
+	
 }
 
 //-- class SingleOptions --/////////////////////////////////////////////////////////////////////////
@@ -357,11 +375,11 @@ void Options::getUINs(HANDLE hContact, char* &uinIn) {
 }
 
 HANDLE Options::getRealContact(HANDLE hContact) {
-	char* szProto = (char *)CallService(MS_PROTO_GETCONTACTBASEPROTO, (WPARAM) hContact, 0);
+	char* szProto = (char*)CallService(MS_PROTO_GETCONTACTBASEPROTO, (WPARAM) hContact, 0);
 	if (szProto != NULL && !strcmp(szProto,"MetaContacts")) {
 		hContact = (HANDLE) CallService(MS_MC_GETMOSTONLINECONTACT, (WPARAM) hContact, 0);
 	}
-	delete szProto;
+	//delete szProto;
 	return hContact;
 }
 
@@ -382,8 +400,8 @@ HANDLE Options::wndToContact(HWND hwnd)
 	HANDLE hContact;
 	MessageWindowInputData mwid;
 	MessageWindowData mwod;
-
-	hwnd = GetParent(hwnd);
+	//MessageBoxA(NULL, "1", "Debug", MB_OK);
+	//hwnd = GetParent(hwnd);
 	hContact = (HANDLE)CallService(MS_DB_CONTACT_FINDFIRST, 0, 0);
 	mwid.cbSize = sizeof(mwid);
 	mwid.uFlags = MSG_WINDOW_UFLAG_MSG_BOTH;
@@ -391,14 +409,22 @@ HANDLE Options::wndToContact(HWND hwnd)
 	mwod.cbSize = sizeof(mwod);
 	while (hContact)
 	{
+		//MessageBoxA(NULL, "1", "Debug", MB_OK);
 		mwid.hContact = hContact;
 		if (!CallService(MS_MSG_GETWINDOWDATA, (WPARAM)&mwid, (LPARAM)&mwod)) {
-			if ((mwod.uState && MSG_WINDOW_STATE_FOCUS) && mwod.hwndWindow == hwnd)
+			//MessageBoxA(NULL, "2", "Debug", MB_OK);
+			//if ((mwod.uState && MSG_WINDOW_STATE_FOCUS) && (mwod.hwndWindow == hwnd))
+				//return mwid.hContact;
+			if (mwod.hwndWindow == hwnd) {
+				//MessageBoxA(NULL, "3", "Debug", MB_OK);
 				return mwid.hContact;
+			}
 		}
+		//MessageBoxA(NULL, "4", "Debug", MB_OK);
 		hContact = (HANDLE)CallService(MS_DB_CONTACT_FINDNEXT, (WPARAM)hContact, 0);
+		//MessageBoxA(NULL, "5", "Debug", MB_OK);
 	}
-	return 0;
+	return NULL;
 }
 
 void Options::buildProtocolList(HWND hwnd)
@@ -462,9 +488,9 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_GROUP);
 			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cMessageGrouping), 0);
 
-			//-- Show nick
-			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_NICKS);
-			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowNick), 0);
+			//-- Show avatar
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_AVATARS);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowAvatar), 0);
 
 			//-- Show time
 			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_TIME);
@@ -498,7 +524,7 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 	//-- Path to template
 	wchar_t path2[MAX_PATH];
 	qstrPath = curSet->currentTemplate->getRealTemplatePath();
-	qstrPath.toWCharArray(path);			
+	qstrPath.toWCharArray(path);
 	CallService(MS_UTILS_PATHTORELATIVEW, (WPARAM)path, (LPARAM)path2);
 	hControl = GetDlgItem(hwndDlg, IDC_TEMPLATE_PATH);
 	SetWindowTextW(hControl, path2);
@@ -515,9 +541,9 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_GROUP);
 	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isMessageGrouping()), 0);
 
-	//-- Show nick
-	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_NICKS);
-	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowNick()), 0);
+	//-- Show avatar
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_AVATARS);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowAvatar()), 0);
 
 	//-- Show time
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_TIME);
@@ -568,9 +594,9 @@ int Options::prepareToSave(HWND hwndDlg)
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_GROUP);	
 	current->cMessageGrouping = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
 
-	//-- Show nick
-	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_NICKS);	
-	current->cShowNick = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+	//-- Show avatar
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_AVATARS);	
+	current->cShowAvatar = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
 
 	//-- Show time
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_TIME);	
@@ -658,9 +684,9 @@ void Options::saveSingleSettings(HWND hwndDlg, QString qsProto, HANDLE hContact,
 	sprintf(dbsName, "%s.%s", szProto, ELISE_MESSG_GROUP);
 	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cMessageGrouping);
 
-	//-- Save show nicks
-	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_NICK);
-	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowNick);
+	//-- Save show avatar
+	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_AVATAR);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowAvatar);
 
 	//-- Save show time
 	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_TIME);
@@ -696,16 +722,15 @@ int Options::updateSettingsInMap(QString qsProto, SAVEOPTIONS* opt)
 	current->setMessageGrouping(opt->cMessageGrouping);
 	current->setRelativeTime(opt->cRelativeTime);
 	current->setShowDate(opt->cShowDate);
-	current->setShowNick(opt->cShowNick);
+	current->setShowAvatar(opt->cShowAvatar);
 	current->setShowSeconds(opt->cShowSeconds);
 	current->setShowTime(opt->cShowTime);
 	current->setURLParse(opt->cURLParse);
 	current->setWordDate(opt->cWordDate);
 
 	//-- Template path
-	current->currentTemplate->setTemplatePath(opt->pszPath);
-
 	TemplateMap* templ = current->currentTemplate;
+	templ->setTemplatePath(opt->pszPath);
 
 	//-- Try to load template
 	//if (!templ->getTemplatePath()->isEmpty())
@@ -748,13 +773,13 @@ int Options::loadSingleSettings(char* szProto, HANDLE hContact)
 
 		//-- Default options can't have BST_INDETERMINATE value (cNotSet)
 		if (!strcmp(szProto, ELISE_DEFAULT_OPT)) {
-			defVal = 2;			//-- Note: "2" is disable
+			defVal = 0;			//-- Note: "0" is disable
 		}
 		
 		newOpt->setBBcodes(defVal);
 		newOpt->setURLParse(defVal);
 		newOpt->setMessageGrouping(defVal);
-		newOpt->setShowNick(defVal);
+		newOpt->setShowAvatar(defVal);
 		newOpt->setShowTime(defVal);
 		newOpt->setShowSeconds(defVal);
 		newOpt->setShowDate(defVal);
@@ -773,7 +798,7 @@ int Options::loadSingleSettings(char* szProto, HANDLE hContact)
 		unsigned char defVal = cNotSet;
 		//-- Default options can't have BST_INDETERMINATE value (cNotSet)
 		if (!strcmp(szProto, ELISE_DEFAULT_OPT))
-			defVal = 2;
+			defVal = 0;
 
 		//-- BBCodes
 		sprintf(dbsName, "%s.%s", szProto, ELISE_BBCODES_ENABLE);
@@ -799,13 +824,13 @@ int Options::loadSingleSettings(char* szProto, HANDLE hContact)
 		else
 			newOpt->setMessageGrouping(defVal);
 
-		//-- Show nick
-		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_NICK);
+		//-- Show avatar
+		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_AVATAR);
 		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
 		if (dbResult != -1)
-			newOpt->setShowNick(dbResult);
+			newOpt->setShowAvatar(dbResult);
 		else
-			newOpt->setShowNick(defVal);
+			newOpt->setShowAvatar(defVal);
 
 		//-- Show time
 		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_TIME);
@@ -895,196 +920,249 @@ TemplateMap* Options::isTemplateInited(HANDLE hContact)
 			return result;
 	}
 	//-- The last try is checking default settings
-
 	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->currentTemplate;
-	if (result->isTemplateInited())
-		return result;
-
-	return NULL;
+	return result;
 }
 unsigned char Options::isBBCodes(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
-	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	unsigned char dresult;
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isBBCodes();
-		if (result != cNotSet)
-			return result;
-	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isBBCodes();
-		if (result != cNotSet)
-			return result;
-	}
-	
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isBBCodes();
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isBBCodes();
 
-	return result;
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isBBCodes();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isBBCodes();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
+	}
+	return 0;
 }
 unsigned char Options::isURLParse(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
+	unsigned char dresult;
 	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isURLParse();
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isURLParse();
-		if (result != cNotSet)
-			return result;
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isURLParse();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isURLParse();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
 	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isURLParse();
-		if (result != cNotSet)
-			return result;
-	}
 
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isURLParse();
-
-	return result;
+	return 0;
 }
 unsigned char Options::isMessageGrouping(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
+	unsigned char dresult;
 	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isMessageGrouping();
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isMessageGrouping();
-		if (result != cNotSet)
-			return result;
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isMessageGrouping();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isMessageGrouping();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
 	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isMessageGrouping();
-		if (result != cNotSet)
-			return result;
-	}
-	
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isMessageGrouping();
 
-	return result;
+	return 0;
 }
-unsigned char Options::isShowNick(HANDLE hContact)
+unsigned char Options::isShowAvatar(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
-	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	unsigned char dresult;
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isShowNick();
-		if (result != cNotSet)
-			return result;
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowAvatar();
+
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isShowAvatar();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isShowAvatar();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
 	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isShowNick();
-		if (result != cNotSet)
-			return result;
-	}
 
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowNick();
-
-	return result;
+	return 0;
 }
 unsigned char Options::isShowTime(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
+	unsigned char dresult;
 	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowTime();
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isShowTime();
-		if (result != cNotSet)
-			return result;
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isShowTime();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isShowTime();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
 	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isShowTime();
-		if (result != cNotSet)
-			return result;
-	}
 
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowTime();
-
-	return result;
+	return 0;
 }
 unsigned char Options::isShowSeconds(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
+	unsigned char dresult;
 	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowSeconds();
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isShowSeconds();
-		if (result != cNotSet)
-			return result;
-	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isShowSeconds();
-		if (result != cNotSet)
-			return result;
-	}
-		
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowSeconds();
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
 
-	return result;
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isShowSeconds();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isShowSeconds();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
+	}
+
+	return 0;
 }
 unsigned char Options::isShowDate(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
-	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	unsigned char dresult;
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isShowDate();
-		if (result != cNotSet)
-			return result;
-	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isShowDate();
-		if (result != cNotSet)
-			return result;
-	}
-		
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowDate();
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowDate();
 
-	return result;
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isShowDate();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isShowDate();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
+	}
+
+	return 0;
 }
 unsigned char Options::isWordDate(HANDLE hContact)
 {
 	QString qsProto;
 	QString qsUIN;
 	unsigned char result;
-	
-	findSettingsInMap(hContact, qsUIN, qsProto);
+	unsigned char dresult;
 
-	if (settings.contains(qsUIN)) {
-		result = settings.value(qsUIN)->isWordDate();
-		if (result != cNotSet)
-			return result;
-	}
-	if (settings.contains(qsProto)) {
-		result = settings.value(qsProto)->isWordDate();
-		if (result != cNotSet)
-			return result;
-	}
-	
-	result = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isWordDate();
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isWordDate();
 
-	return result;
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isWordDate();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isWordDate();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
+	}
+
+	return 0;
+}
+unsigned char Options::isRelativeTime(HANDLE hContact)
+{
+	QString qsProto;
+	QString qsUIN;
+	unsigned char result;
+	unsigned char dresult;
+
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isRelativeTime();
+
+	if (dresult != cNotSet) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isRelativeTime();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isRelativeTime();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
+	}
+
+	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

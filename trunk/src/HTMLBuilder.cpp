@@ -53,11 +53,20 @@
 #define FONT_NUM 19
 
 
-QString oneShot = "oneShot";
-//extern QUrl skinDir;
+const QString oneShot = "oneShot";
+const QString noAvatar = "img/noavatar.jpg";
+const QString noTemplate = "No templates were found";
 
+HTMLBuilder::HTMLBuilder(Elise* view, HWND hwndParent)
+{
+	parent = hwndParent;
+	//-- First, get contact's handle
+	hContact = Options::wndToContact(parent);
+	
+	options = new SingleOptions(hContact);
 
-HTMLBuilder::HTMLBuilder(Elise* view) {
+	initHead();
+	
 	setLastEventType(-1);
 	setLastEventTime(time(NULL));
 	lastEventTime = time(NULL);
@@ -79,10 +88,27 @@ HTMLBuilder::~HTMLBuilder() {
 	if (lastIEViewEvent.pszProto != NULL) {
 		delete (char*)lastIEViewEvent.pszProto;
 	}
+	//-- No no no! see SingleOptions::SingleOptions(HANDLE hContact);
+	//options->currentTemplate->~TemplateMap();
+	options->~SingleOptions();
 }
 
-void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
-	HANDLE hRealContact;
+HANDLE HTMLBuilder::getContact()
+{
+	return hContact;
+}
+
+HWND HTMLBuilder::getParent()
+{
+	return parent;
+}
+
+void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
+{
+	if (!options->currentTemplate->isTemplateInited())
+		return;
+
+	HANDLE hCurContact;
 	char* szRealProto = NULL;
 	char* szProto = NULL;
 	QString qsUIN;
@@ -97,66 +123,62 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 	QString qsText;
 	QString qsTime;
 	QString qsDate;
+	//QString qsFile;
 
-	hRealContact = Options::getRealContact(event->hContact);
-	szRealProto = Options::getProto(hRealContact);
+	QString templateBuf;
+
+	hCurContact = Options::getRealContact(event->hContact);
+	szRealProto = Options::getProto(hCurContact);
 	szProto = Options::getProto(event->pszProto, event->hContact);
 
-	// вот тут в ieview создают карту шаблона..при каждом полученном сообщении? втф?
+	//-- 
 
 	if (event->hContact != NULL) {
 		getUINs(event->hContact, qsUINIn, qsUINOut);
-	}
-
-	// names
-	if (event->hContact != NULL) {
+		//-- Names
 		qsNameOut = QString::fromWCharArray(getContactName(NULL, szProto));
 		qsNameIn = QString::fromWCharArray(getContactName(event->hContact, szProto));
-	} else {
+		//-- Avatars
+		if (options->isShowAvatar()) {
+			getAvatar(event->hContact, szRealProto, qsAvatarIn);
+			if (qsAvatarIn.isEmpty())
+				qsAvatarIn = noAvatar;
+			getAvatar(NULL, szRealProto, qsAvatarOut);
+			if (qsAvatarOut.isEmpty())
+				qsAvatarOut = noAvatar;
+		}
+	}
+	else {
 		qsNameOut = "&nbsp;";
 		qsNameIn = "&nbsp;";
+		qsUINIn = "&nbsp;";
+		qsUINOut = "&nbsp;";
+		qsAvatarIn = "&nbsp;";
+		qsAvatarOut = "&nbsp;";
 	}
-
-	// avatars
-	if(event->hContact != NULL) {
-		getAvatar(event->hContact, szRealProto, qsAvatarIn);
-	}
-	if (qsAvatarIn == NULL) {
-		qsAvatarIn = "<img src=\"img/noavatar.jpg\">";
-	}
-	getAvatar(NULL, szRealProto, qsAvatarOut);
-	if (qsAvatarOut == NULL) {
-		qsAvatarOut = "<img src=\"img/noavatar.jpg\">";
-	}
-	/*if(event->hContact != NULL) {
-	if (!DBGetContactSetting(event->hContact, "CList", "StatusMsg",&dbv)) {
-	if (strlen(dbv.pszVal) > 0) {
-	szStatusMsg = Utils::UTF8Encode(dbv.pszVal);
-	}
-	DBFreeVariant(&dbv);
-	}
-	}*/
 
 	int isHistory = 0;
 
 	IEVIEWEVENTDATA* eventData = event->eventData;
 	for (int eventIdx = 0; eventData!=NULL && (eventIdx < event->count || event->count==-1); eventData = eventData->next, eventIdx++) {
-		if (eventData->iType == IEED_EVENT_MESSAGE) {
+		if (eventData->iType == IEED_EVENT_MESSAGE || eventData->iType == IEED_EVENT_STATUSCHANGE || eventData->iType == IEED_EVENT_FILE || eventData->iType == IEED_EVENT_URL || eventData->iType == IEED_EVENT_SYSTEM) {
 			int isSent = (eventData->dwFlags & IEEDF_SENT);
 			//int isRTL = (eventData->dwFlags & IEEDF_RTL) && tmpm->isRTL();
 			int isRTL = (eventData->dwFlags & IEEDF_RTL);
 			isHistory = (eventData->time < (DWORD)getStartedTime() && (eventData->dwFlags & IEEDF_READ || eventData->dwFlags & IEEDF_SENT));
-			//int isGroupBreak = TRUE;
-			//if ((getFlags(protoSettings) & Options::LOG_GROUP_MESSAGES) && eventData->dwFlags == LOWORD(getLastEventType())
-			//        && eventData->iType == IEED_EVENT_MESSAGE && HIWORD(getLastEventType()) == IEED_EVENT_MESSAGE
-			//        && (isSameDate(eventData->time, getLastEventTime()))
-			//        //&& ((eventData->time < today) == (getLastEventTime() < today))
-			//        && (((eventData->time < (DWORD)startedTime) == (getLastEventTime() < (DWORD)startedTime)) || !(eventData->dwFlags & IEEDF_READ))) {
-			//    isGroupBreak = FALSE;
-			//}
+			int isGroupBreak = TRUE;
+			if ((options->isMessageGrouping()) && eventData->dwFlags == LOWORD(getLastEventType())
+			        && eventData->iType == IEED_EVENT_MESSAGE && HIWORD(getLastEventType()) == IEED_EVENT_MESSAGE
+			        && (isSameDate(eventData->time, getLastEventTime()))
+			        //&& ((eventData->time < today) == (getLastEventTime() < today))
+			        && (((eventData->time < (DWORD)startedTime) == (getLastEventTime() < (DWORD)startedTime)) || !(eventData->dwFlags & IEEDF_READ))) {
+				   isGroupBreak = FALSE;
+			}
 
 			qsText = "";
 			qsName = "";
+			//qsFile = "";
+			templateBuf = "";
 
 			// TODO часть с Ascii, наверно, надо убрать..нахрена она тут нужна? юникод же
 			if (event->eventData->dwFlags & IEEDF_UNICODE_NICK) {
@@ -169,53 +191,120 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event) {
 			} else {
 				qsText = QString::fromAscii(eventData->pszText);
 			}
-
-			// save old last event
-			//lastEvent.replace(oneShot, "");
-			//document += lastEvent;
+			//if (eventData->dwFlags & IEEDF_UNICODE_TEXT2) {
+			//	qsFile = QString::fromWCharArray(eventData->pszText2W);
+   			//} else {
+			//	qsFile = QString::fromAscii(eventData->pszText2);
+			//}
 
 			if (isSent) {
 				qsAvatar = qsAvatarOut;
 				qsUIN = qsUINOut;
-				//lastEvent = TemplateMap::templateMap["<!--MessageOut-->"];
-				lastEvent = "trololo";
 			} else {
 				qsAvatar = qsAvatarIn;
 				qsUIN = qsUINIn;
-				//lastEvent = TemplateMap::templateMap["<!--MessageIn-->"];
-				lastEvent = "trololo2";
+			}
+			
+			switch (eventData->iType) {
+			case (IEED_EVENT_MESSAGE):
+				{
+					if (!isRTL) {
+						if (options->isMessageGrouping()) {
+							if (isGroupBreak) {
+								lastEvent = isHistory ? isSent ? "<!--hMessageOutGroupStart-->" : "<!--hMessageInGroupStart-->" : isSent ? "<!--MessageOutGroupStart-->" : "<!--MessageInGroupStart-->";
+							} else {
+								lastEvent = isHistory ? isSent ? "<!--hMessageOutGroupInner-->" : "<!--hMessageInGroupInner-->" : isSent ? "<!--MessageOutGroupInner-->" : "<!--MessageInGroupInner-->";
+							}
+							templateBuf = isHistory ? isSent ? "<!--hMessageOutGroupEnd-->" : "<!--hMessageInGroupEnd-->" : isSent ? "<!--MessageOutGroupEnd-->" : "<!--MessageInGroupEnd-->";
+						} else {
+							lastEvent = isHistory ? isSent ? "<!--hMessageOut-->" : "<!--hMessageIn-->" : isSent ? "<!--MessageOut-->" : "<!--MessageIn-->";
+						}
+					} else {/*
+							if (options->isMessageGrouping()) {
+							if (isGroupBreak) {
+							lastEvent = isHistory ? isSent ? "<!--hMessageOutGroupStartRTL-->" : "<!--hMessageInGroupStartRTL-->" : isSent ? "<!--MessageOutGroupStartRTL-->" : "<!--MessageInGroupStartRTL-->";
+							} else {
+							lastEvent = isHistory ? isSent ? "<!--hMessageOutGroupInnerRTL-->" : "<!--hMessageInGroupInnerRTL-->" : isSent ? "<!--MessageOutGroupInnerRTL-->" : "<!--MessageInGroupInnerRTL-->";
+							}
+							groupTemplate = isHistory ? isSent ? "<!--hMessageOutGroupEndRTL-->" : "<!--hMessageInGroupEndRTL-->" : isSent ? "<!--MessageOutGroupEndRTL-->" : "<!--MessageInGroupEndRTL-->";
+							} else {
+							lastEvent = isHistory ? isSent ? "<!--hMessageOutRTL-->" : "<!--hMessageInRTL-->" : isSent ? "<!--MessageOutRTL-->" : "<!--MessageInRTL-->";
+							}*/
+					}
+				}
+				break;
+			case (IEED_EVENT_FILE):
+				{
+					if (options->currentTemplate->isFilesInOut())
+						lastEvent = isHistory ? isSent ? "<!--hFileOut-->" : "<!--hFileIn-->" : isSent ? "<!--FileOut-->" : "<!--FileIn-->";
+					else
+						lastEvent = isHistory ? "<!--hFile-->" : "<!--File-->";				
+				}
+				break;
+			case (IEED_EVENT_URL):
+				{
+					if (options->currentTemplate->isURLInOut())
+						lastEvent = isHistory ? isSent ? "<!--hURLOut-->" : "<!--hURLIn-->" : isSent ? "<!--URLOut-->" : "<!--URLIn-->";
+					else
+						lastEvent = isHistory ? "<!--hURL-->" : "<!--URL-->";
+
+				}
+				break;
+			case (IEED_EVENT_STATUSCHANGE):
+			case (IEED_EVENT_SYSTEM):
+				{
+					lastEvent = isHistory ? "<!--hStatus-->" : "<!--Status-->";
+				}
+				break;
 			}
 
-			//qsTime = QString::fromAscii(timestampToString(getFlags(protoSettings), eventData->time, 1));
-			qsTime = QString::fromAscii(timestampToString(NULL, eventData->time, 1));
-			qsDate = QString::fromAscii(timestampToString(NULL, eventData->time, 0));
+			QMap<QString, QString>* templMap = &options->currentTemplate->templateMap;
 
-			// new lines
+			if (options->isMessageGrouping()) {
+				if (templMap->contains(lastEvent) && templMap->contains(templateBuf))
+					lastEvent = templMap->value(templateBuf) + templMap->value(lastEvent);
+				else
+					lastEvent = "Error";
+			}
+			else {
+				if (templMap->contains(lastEvent))
+					lastEvent = templMap->value(lastEvent);
+				else
+					lastEvent = "Error\nTemplate not found - " + lastEvent;
+			}
+
+			//-- Worcking with date and time
+			getTime(qsTime, qsDate, eventData->time);
+			
+			//-- New lines
 			qsText.replace("\n", "<br>\n");
 
-			// workin with url's         
-			replaceURL(qsText);
+			//-- Workin with url's
+			if (options->isURLParse())
+				replaceURL(qsText);
 
-			// working with BBCodes
-			replaceBBCodes(qsText);
+			//-- Working with BBCodes
+			if (options->isBBCodes())
+				replaceBBCodes(qsText);
 
-			// workin with smileys         
+			//-- Workin with smileys         
 			replaceSmileys(qsText,isSent, event->hContact, szProto);
 
-			// final step of making message
-			TemplateMap* templ = Options::isTemplateInited(event->hContact);
-			lastEvent.replace("%base%", templ->getRealTemplatePath());  // base URL
-			lastEvent.replace("%name%", qsName);          // contact's name or user's name (depends on context)
+			//-- Final step of making message
+			lastEvent.replace("%base%", options->currentTemplate->getRealTemplatePath());  // base URL
 			lastEvent.replace("%time%", qsTime);          // event's time
 			lastEvent.replace("%date%", qsDate);          // event's date
-			lastEvent.replace("%text%", qsText);          // event's text
 			lastEvent.replace("%cid%", qsUIN);            // contact's ID or user's ID (depends on context)
+			lastEvent.replace("%cidIn%", qsUINIn);          // user's ID
+			lastEvent.replace("%cidOut%", qsUINOut);         // contact's ID
 			lastEvent.replace("%avatar%", qsAvatar);      // link to contact's picture file or user's picure file (depends on context)
 			lastEvent.replace("%avatarIn%", qsAvatarIn);  // link to contact's picture
 			lastEvent.replace("%avatarOut%",qsAvatarOut); // link to user's picture
+			lastEvent.replace("%name%", qsName);          // contact's name or user's name (depends on context)
 			lastEvent.replace("%nameIn%", qsNameIn);      // contact's name
 			lastEvent.replace("%nameOut%", qsNameOut);    // users's name
 			lastEvent.replace("%proto%", QString::fromAscii(szProto)); // protocol name
+			lastEvent.replace("%text%", qsText);          // event's text
 			//parentView->addToDoc(lastEvent);
 			if (isHistory)
 				history += lastEvent;
@@ -244,7 +333,7 @@ void HTMLBuilder::appendEventOld(Elise* view, IEVIEWEVENT* event) {
 	event->hDbEventFirst = NULL;
 	newEvent.cbSize = sizeof (IEVIEWEVENT);
 	newEvent.iType = IEE_LOG_MEM_EVENTS;
-	newEvent.codepage = CP_UTF8;
+	newEvent.codepage = CP_ACP;
 	// не самый понятный иевьюшный фальклер...хотя...он тут везде
 	// TODO заменить на szProto = getProto(event->hContact);
 	char* szProto = NULL;
@@ -375,10 +464,10 @@ void HTMLBuilder::appendEventNew(Elise* view, IEVIEWEVENT* event) {
 	// честно..пока не знаю, зачем оно тут.
 	setLastIEViewEvent(event);
 	// --
-	appendEvent(view, event);
+	appendEventTemplate(view, event);
 }
 
-void HTMLBuilder::appendEvent(Elise* view, IEVIEWEVENT* event) {
+/*void HTMLBuilder::appendEvent(Elise* view, IEVIEWEVENT* event) {
 	//ProtocolSettings *protoSettings = getSRMMProtocolSettings(event->hContact);
 	//if (protoSettings == NULL) {
 	//	return;
@@ -389,7 +478,7 @@ void HTMLBuilder::appendEvent(Elise* view, IEVIEWEVENT* event) {
 	//	appendEventNonTemplate(view, event);
 	//}
 	appendEventTemplate(view, event);
-}
+}*/
 
 wchar_t* HTMLBuilder::getContactName(HANDLE hContact, const char* szProto) {
 	CONTACTINFO ci;
@@ -446,6 +535,44 @@ void HTMLBuilder::getUINs(HANDLE hContact, QString& uinIn, QString& uinOut)
 	if (szUINOut!=NULL) delete szUINOut;
 }
 
+void HTMLBuilder::getTime(QString& qsTime, QString& qsDate, time_t time)
+{
+	QDateTime date = QDateTime::fromTime_t(time);
+	//-- Time
+	if (options->isShowTime()) {
+		if (options->isShowSeconds())
+			qsTime = date.toString("hh:mm:ss");
+		else
+			qsTime = date.toString("hh:mm");
+	}
+	else
+		qsTime = "";
+	//-- Date
+	if (options->isShowDate()) {
+		QDate now = QDate::currentDate();
+		int yy;
+		int mm;
+		int dd;
+		now.getDate(&yy, &mm, &dd);
+		QDate yesterday = QDate(yy, mm, dd - 1);
+		if (options->isRelativeTime() && date.date() == now) {
+			qsDate = QString::fromLocal8Bit(Translate("Today"));
+		}
+		else if (options->isRelativeTime() && date.date() == yesterday) {
+			qsDate = QString::fromLocal8Bit(Translate("Yesterday"));
+		}
+		else
+			if (options->isWordDate()) {
+				qsDate = date.toString("dddd dd MMMM yyyy");
+			}
+			else {
+				qsDate = date.toString("dd.MM.yyyy");
+			}
+	}
+	else
+		qsDate = "";
+}
+
 // TODO привести в божеский вид
 void HTMLBuilder::getAvatar(HANDLE hContact, const char* szProto, QString& result) {
 	//DBVARIANT dbv;
@@ -484,9 +611,9 @@ void HTMLBuilder::getAvatar(HANDLE hContact, const char* szProto, QString& resul
 		DBFreeVariant(&dbv);
 	}*/
 
-		if (result != NULL) {
+		/*if (result != NULL) {
 			result.replace(result, "<img src=\"" + result + "\">");
-		}
+		}*/
 		//return result;
 }
 /*const char* HTMLBuilder::getFlashAvatar(const char* file, int index) {
@@ -586,48 +713,21 @@ void HTMLBuilder::replaceSmileys(QString& text, bool isSent, HANDLE hContact, ch
 	return;
 }
 
-// TODO перелопатить
-char* HTMLBuilder::timestampToString(DWORD dwFlags, time_t check, int mode) {
-	static char szResult[512];
-	char str[80];
-	DBTIMETOSTRING dbtts;
-	dbtts.cbDest = 70;
-	dbtts.szDest = str;
-	szResult[0] = '\0';
-	if (mode) { //time
-		//dbtts.szFormat = (dwFlags & Options::LOG_SHOW_SECONDS) ? (char *)"s" : (char *)"t";
-		dbtts.szFormat = (char *)"s";
-		CallService(MS_DB_TIME_TIMESTAMPTOSTRING, check, (LPARAM) & dbtts);
-		strncat(szResult, str, 500);
-	} else {    //date
-		struct tm tm_now, tm_today;
-		time_t now = time(NULL);
-		time_t today;
-		tm_now = *localtime(&now);
-		tm_today = tm_now;
-		tm_today.tm_hour = tm_today.tm_min = tm_today.tm_sec = 0;
-		today = mktime(&tm_today);
-		//if (dwFlags & Options::LOG_RELATIVE_DATE && check >= today) {
-		if (check >= today) {
-			strcpy(szResult, Translate("Today"));
-			//} else if(dwFlags & Options::LOG_RELATIVE_DATE && check > (today - 86400)) {
-		} else if(check > (today - 86400)) {
-			strcpy(szResult, Translate("Yesterday"));
-		} else {
-			//dbtts.szFormat = (dwFlags & Options::LOG_LONG_DATE) ? (char *)"D" : (char *)"d";
-			dbtts.szFormat = (char *)"D";
-			CallService(MS_DB_TIME_TIMESTAMPTOSTRING, check, (LPARAM) & dbtts);
-			strncat(szResult, str, 500);
-		}
+bool HTMLBuilder::isSameDate(time_t time1, time_t time2) {
+    struct tm tm_t1, tm_t2;
+    tm_t1 = *localtime((time_t *)(&time1));
+    tm_t2 = *localtime((time_t *)(&time2));
+    if (tm_t1.tm_year == tm_t2.tm_year && tm_t1.tm_mon == tm_t2.tm_mon
+		&& tm_t1.tm_mday == tm_t2.tm_mday) {
+		return true;
 	}
-	Utils::UTF8Encode(szResult, szResult, 500);
-	return szResult;
+	return false;
 }
 
 void HTMLBuilder::setLastIEViewEvent(IEVIEWEVENT* event) {
 	lastIEViewEvent.cbSize = sizeof (IEVIEWEVENT);
 	lastIEViewEvent.iType = event->iType;
-	lastIEViewEvent.codepage = CP_UTF8;
+	lastIEViewEvent.codepage = CP_ACP;
 	if (event->cbSize >= IEVIEWEVENT_SIZE_V2) {
 		lastIEViewEvent.codepage = event->codepage;
 	}
@@ -677,11 +777,73 @@ time_t HTMLBuilder::getStartedTime() {
 	return startedTime;
 }
 
-void HTMLBuilder::initHead() {
-	//header = TemplateMap::templateMap["<!--HTMLStart-->"];
-	//footer = TemplateMap::templateMap["<!--HTMLEnd-->"];
-	header = "trololo3";
-	footer = "trololo4";
+QUrl HTMLBuilder::getTemplateUrl()
+{
+	return options->currentTemplate->getTemplateUrl();
+}
+
+void HTMLBuilder::initHead()
+{
+	if (options->currentTemplate->isTemplateInited()) {
+		//-- Defines
+		HANDLE hRealContact;
+		char* szRealProto = NULL;
+		char* szProto = NULL;
+		QString qsTime;
+		QString qsDate;
+		QString qsUINIn;
+		QString qsUINOut;
+		QString qsAvatarIn;
+		QString qsAvatarOut;
+		QString qsNameIn;
+		QString qsNameOut;
+		//--Proto
+		hRealContact = Options::getRealContact(hContact);
+		szRealProto = Options::getProto(hRealContact);
+		szProto = Options::getProto(hContact);
+		//-- Template
+		QMap<QString, QString>* templMap = &options->currentTemplate->templateMap;
+		header = templMap->value("<!--HTMLStart-->");
+		footer = templMap->value("<!--HTMLEnd-->");
+		//-- Time and date
+		getTime(qsTime, qsDate, time(0));
+		if (hContact != NULL) {
+			//-- UINs
+			getUINs(hContact, qsUINIn, qsUINOut);
+			//-- Names
+			qsNameOut = QString::fromWCharArray(getContactName(NULL, szProto));
+			qsNameIn = QString::fromWCharArray(getContactName(hContact, szProto));
+			//-- Avatars
+			if (options->isShowAvatar()) {				
+				getAvatar(hContact, szRealProto, qsAvatarIn);
+				if (qsAvatarIn.isEmpty())
+					qsAvatarIn = noAvatar;
+				getAvatar(NULL, szRealProto, qsAvatarOut);
+				if (qsAvatarOut.isEmpty())
+					qsAvatarOut = noAvatar;
+			}
+		}
+		else {
+			qsNameOut = "&nbsp;";
+			qsNameIn = "&nbsp;";
+			qsUINIn = "&nbsp;";
+			qsUINOut = "&nbsp;";
+			qsAvatarIn = "&nbsp;";
+			qsAvatarOut = "&nbsp;";
+		}
+		header.replace("%base%", options->currentTemplate->getRealTemplatePath());  // base URL
+		header.replace("%time%", qsTime);          // event's time
+		header.replace("%date%", qsDate);          // event's date
+		header.replace("%cidIn%", qsUINIn);          // user's ID
+		header.replace("%cidOut%", qsUINOut);         // contact's ID
+		header.replace("%avatarIn%", qsAvatarIn);  // link to contact's picture
+		header.replace("%avatarOut%",qsAvatarOut); // link to user's picture
+		header.replace("%nameIn%", qsNameIn);      // contact's name
+		header.replace("%nameOut%", qsNameOut);    // users's name
+		header.replace("%proto%", QString::fromAscii(szProto)); // protocol name
+	}
+	else
+		header = noTemplate;
 }
 
 QString HTMLBuilder::getLastEvent() {
@@ -700,6 +862,7 @@ QString HTMLBuilder::getHistory() {
 
 void HTMLBuilder::clearDoc(IEVIEWEVENT* event) {
 	header.clear();
+	footer.clear();
 	history.clear();
 	lastEvent.clear();
 
@@ -710,10 +873,6 @@ void HTMLBuilder::clearDoc(IEVIEWEVENT* event) {
 		setLastEventType(-1);
 	}
 }
-
-//void HTMLBuilder::addToDoc() {
-//	parentView->addToDoc(lastEvent);
-//}
 
 int HTMLBuilder::getLastEventType() {
 	return iLastEventType;

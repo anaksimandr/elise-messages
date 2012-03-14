@@ -24,7 +24,7 @@ class HTMLBuilder {
 private:
 	DWORD lastEventTime;
 	int iLastEventType;
-	enum ENCODEFLAGS {
+	/*enum ENCODEFLAGS {
 		ENF_NONE = 0,
 		ENF_SMILEYS = 1,
 		ENF_NAMESMILEYS = 2,
@@ -32,19 +32,22 @@ private:
 		ENF_LINKS = 8,
 		ENF_ALL = 255,
 		ENF_CHAT_FORMATTING = 256
-	};
+	};*/
+	HWND			parent;
+	HANDLE			hContact;
 	Elise*			parentView;
 	QString			header;
 	QString			footer;
 	QString			history;
 	QString			lastEvent;
 	//QString			document;
-
+	SingleOptions*	options;
 	IEVIEWEVENT		lastIEViewEvent;
 	time_t			startedTime;
-	char*			timestampToString(DWORD dwFlags, time_t check, int mode);
-	void			getUINs(HANDLE hContact, QString& uinIn, QString& uinOut);
+	void			getTime(QString& qsTime, QString& qsDate, time_t time);
+	bool			isSameDate(time_t time1, time_t time2);
 	void			getAvatar(HANDLE hContact, const char* szProto, QString& result);
+	void			getUINs(HANDLE hContact, QString& uinIn, QString& uinOut);
 	void			replaceBBCodes(QString& text);
 	void			replaceURL(QString& text);
 	void			replaceSmileys(QString& text, bool isSent, HANDLE hContact, char* szProto);
@@ -59,19 +62,22 @@ private:
 	void			setLastEventType(int);
 	//void addToDoc();
 public:
-	HTMLBuilder(Elise* view);
+	HTMLBuilder(Elise* view, HWND hwndParent);
 	~HTMLBuilder();
 
+	HANDLE			getContact();
+	HWND			getParent();
 	QString			getHead();
 	QString			getLastEvent();
 	QString			getHistory();
+	QUrl			getTemplateUrl();
 	//QString			getDocument();
 	//void			setDocument(QString doc);
 	void			initHead();
 	void			clearDoc(IEVIEWEVENT* event);
 	void			appendEventOld(Elise*, IEVIEWEVENT* event);
 	void			appendEventNew(Elise* view, IEVIEWEVENT* event);
-	void			appendEvent(Elise*, IEVIEWEVENT* event);
+	//void			appendEvent(Elise*, IEVIEWEVENT* event);
 	time_t			getStartedTime();
 };
 

@@ -42,8 +42,8 @@ private:
 	//static bool		templateInitialized;
 	//bool			isHeaderSet;
     HWND            hwnd;
-    HWND            parent;
-	HANDLE			hContact;
+
+	//HANDLE			hContact;
     Elise           *prev, *next;
     int             height;
     int             width;
@@ -55,7 +55,7 @@ protected:
     //void			navigate(const char *);
     //void			navigate(const wchar_t *);
 public:
-    Elise(HWND parent, int x, int y, int cx, int cy);
+    Elise(HWND parent, int x, int y, int cx, int cy, bool showIt);
     ~Elise();
     HWND            getHWND();
     static Elise*   get(HWND);
