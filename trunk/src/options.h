@@ -28,6 +28,7 @@ typedef struct {
 	unsigned char	cShowDate;
 	unsigned char	cWordDate;
 	unsigned char	cRelativeTime;
+	unsigned char	cShowSmileys;
 	wchar_t			pszPath[MAX_PATH];
 } SAVEOPTIONS;
 
@@ -48,6 +49,7 @@ private:
 	unsigned char	cShowDate;
 	unsigned char	cWordDate;
 	unsigned char	cRelativeTime;
+	unsigned char	cShowSmileys;
 public:
 	TemplateMap*	currentTemplate;
 
@@ -66,6 +68,7 @@ public:
 	inline unsigned char	isShowDate() {return cShowDate;};
 	inline unsigned char	isWordDate() {return cWordDate;};
 	inline unsigned char	isRelativeTime() {return cRelativeTime;};
+	inline unsigned char	isShowSmileys() {return cShowSmileys;};
 
 	//-- Setters
 	inline void			setBBcodes(unsigned char val) {cBBCodes = val;};
@@ -77,6 +80,7 @@ public:
 	inline void			setShowDate(unsigned char val) {cShowDate = val;};
 	inline void			setWordDate(unsigned char val) {cWordDate = val;};
 	inline void			setRelativeTime(unsigned char val) {cRelativeTime = val;};
+	inline void			setShowSmileys(unsigned char val) {cShowSmileys = val;};
 }; //SingleOptions
 
 class Options {
@@ -169,6 +173,7 @@ public:
 	static unsigned char	isShowDate(HANDLE hContact);
 	static unsigned char	isWordDate(HANDLE hContact);
 	static unsigned char	isRelativeTime(HANDLE hContact);
+	static unsigned char	isShowSmileys(HANDLE hContact);
 
 	static int		initOptions();
 	inline static QMap<QString, SingleOptions*>*	getSettingsMap() {return &settings;};

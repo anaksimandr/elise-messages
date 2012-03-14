@@ -20,6 +20,7 @@ Elise Messages Plugin for Miranda IM
 #define ELISE_DATE_SHOW			"date"
 #define ELISE_DATE_WORD			"date_word"
 #define ELISE_DATE_RELAT		"date_relat"
+#define ELISE_SHOW_SMILEYS		"smileys"
 
 
 //-- Constants, which are means that the option is not set
@@ -101,7 +102,22 @@ INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lP
 		break;
 	case WM_COMMAND:
 		{
-			switch (LOWORD(wParam)) {
+			switch (LOWORD(wParam)) {			
+				//-- List of checkboxes
+			case IDC_CHECKBOX_BBCODES:
+			case IDC_CHECKBOX_URL:
+			case IDC_CHECKBOX_GROUP:
+			case IDC_CHECKBOX_AVATARS:
+			case IDC_CHECKBOX_TIME:
+			case IDC_CHECKBOX_SECONDS:
+			case IDC_CHECKBOX_DATE:
+			case IDC_CHECKBOX_DATEWORD:
+			case IDC_CHECKBOX_DATERELAT:
+			case IDC_CHECKBOX_SMILEYS:
+				{
+					SendMessage(GetParent(hwndDlg), PSM_CHANGED, 0, 0);
+				}
+				break;
 			case IDC_BROWSE_TEMPLATES:
 				if (Options::BrowseFile(hwndDlg, L"Template (*.ivt)\0*.ivt\0All Files\0*.*\0\0", L"ivt", tmp, sizeof(tmp))) {
 					wchar_t pszPath2[MAX_PATH];
@@ -132,17 +148,11 @@ INT_PTR CALLBACK DlgProcOptions(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lP
 					Options::updateProtocolSettings(hwndDlg, tmp);                        
 				}
 				break;
-			//-- List of checkboxes
-			case IDC_CHECKBOX_BBCODES:
-			case IDC_CHECKBOX_URL:
-			case IDC_CHECKBOX_GROUP:
-			case IDC_CHECKBOX_AVATARS:
-			case IDC_CHECKBOX_TIME:
-			case IDC_CHECKBOX_SECONDS:
-			case IDC_CHECKBOX_DATE:
-			case IDC_CHECKBOX_DATEWORD:
-			case IDC_CHECKBOX_DATERELAT:
+			case IDC_BUTTON_DELPATH:
 				{
+					//wchar_t pszPath2[MAX_PATH];
+					//cqstrNotSet.toWCharArray(pszPath2);
+					SetDlgItemTextW(hwndDlg, IDC_TEMPLATE_PATH, L"NOTSET");
 					SendMessage(GetParent(hwndDlg), PSM_CHANGED, 0, 0);
 				}
 				break;
@@ -220,6 +230,7 @@ SingleOptions::SingleOptions()
 	cShowDate = cNotSet;
 	cWordDate = cNotSet;
 	cRelativeTime = cNotSet;
+	cShowSmileys = cNotSet;
 }
 
 SingleOptions::SingleOptions(SingleOptions* other)
@@ -234,6 +245,7 @@ SingleOptions::SingleOptions(SingleOptions* other)
 	cShowSeconds = other->isShowSeconds();
 	cShowDate = other->isShowDate();
 	cWordDate = other->isWordDate();
+	cShowSmileys = other->isShowSmileys();
 	cRelativeTime = other->isRelativeTime();
 
 }
@@ -251,6 +263,7 @@ SingleOptions::SingleOptions(HANDLE hContact)
 	cShowDate = Options::isShowDate(hContact);
 	cWordDate = Options::isWordDate(hContact);
 	cRelativeTime = Options::isRelativeTime(hContact);
+	cShowSmileys = Options::isShowSmileys(hContact);
 
 }
 
@@ -512,6 +525,10 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATERELAT);
 			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cRelativeTime), 0);
 
+			//-- Smileys
+			hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_SMILEYS);
+			SendMessage(hControl, BM_SETCHECK, updateCheckBox(current->cShowSmileys), 0);
+
 			return;
 		} //if
 	} //if
@@ -565,6 +582,10 @@ void Options::updateProtocolSettings(HWND hwndDlg, wchar_t proto[MAX_PATH])
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATERELAT);
 	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isRelativeTime()), 0);
 
+	//-- Smileys
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_SMILEYS);
+	SendMessage(hControl, BM_SETCHECK, updateCheckBox(curSet->isShowSmileys()), 0);
+
 }
 
 int Options::prepareToSave(HWND hwndDlg)
@@ -617,6 +638,10 @@ int Options::prepareToSave(HWND hwndDlg)
 	//-- Relative date
 	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_DATERELAT);	
 	current->cRelativeTime = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
+
+	//-- Smileys
+	hControl = GetDlgItem(hwndDlg, IDC_CHECKBOX_SMILEYS);	
+	current->cShowSmileys = readCheckBox(SendMessage(hControl, BM_GETCHECK, 0, 0));
 
 	if (settingsToSave == NULL) {
 		settingsToSave = new QMap<QString, SAVEOPTIONS*>();
@@ -708,6 +733,10 @@ void Options::saveSingleSettings(HWND hwndDlg, QString qsProto, HANDLE hContact,
 	sprintf(dbsName, "%s.%s", szProto, ELISE_DATE_RELAT);
 	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cRelativeTime);
 
+	//-- Save smileys
+	sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_SMILEYS);
+	DBWriteContactSettingByte(hContact, eliseModuleName, dbsName, opt->cShowSmileys);
+
 }
 
 int Options::updateSettingsInMap(QString qsProto, SAVEOPTIONS* opt)
@@ -727,6 +756,7 @@ int Options::updateSettingsInMap(QString qsProto, SAVEOPTIONS* opt)
 	current->setShowTime(opt->cShowTime);
 	current->setURLParse(opt->cURLParse);
 	current->setWordDate(opt->cWordDate);
+	current->setShowSmileys(opt->cShowSmileys);
 
 	//-- Template path
 	TemplateMap* templ = current->currentTemplate;
@@ -785,6 +815,7 @@ int Options::loadSingleSettings(char* szProto, HANDLE hContact)
 		newOpt->setShowDate(defVal);
 		newOpt->setWordDate(defVal);
 		newOpt->setRelativeTime(defVal);
+		newOpt->setShowSmileys(defVal);
 	}
 	else {
 		//-- If settings was found then load it
@@ -871,6 +902,14 @@ int Options::loadSingleSettings(char* szProto, HANDLE hContact)
 			newOpt->setRelativeTime(dbResult);
 		else
 			newOpt->setRelativeTime(defVal);
+
+		//-- Smileys
+		sprintf(dbsName, "%s.%s", szProto, ELISE_SHOW_SMILEYS);
+		dbResult = DBGetContactSettingByte(hContact, eliseModuleName, dbsName, -1);
+		if (dbResult != -1)
+			newOpt->setShowSmileys(dbResult);
+		else
+			newOpt->setShowSmileys(defVal);
 
 
 		TemplateMap* templ = newOpt->currentTemplate;
@@ -1011,7 +1050,7 @@ unsigned char Options::isShowAvatar(HANDLE hContact)
 
 	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowAvatar();
 
-	if (dresult != cNotSet) {
+	if (dresult != cNotSet && ServiceExists(MS_AV_GETMYAVATAR)) {
 		findSettingsInMap(hContact, qsUIN, qsProto);
 
 		if (settings.contains(qsUIN)) {
@@ -1156,6 +1195,33 @@ unsigned char Options::isRelativeTime(HANDLE hContact)
 		}
 		if (settings.contains(qsProto)) {
 			result = settings.value(qsProto)->isRelativeTime();
+			if (result != cNotSet)
+				return result;
+		}
+		return dresult;
+	}
+
+	return 0;
+}
+unsigned char Options::isShowSmileys(HANDLE hContact)
+{
+	QString qsProto;
+	QString qsUIN;
+	unsigned char result;
+	unsigned char dresult;
+
+	dresult = settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->isShowSmileys();
+
+	if (dresult != cNotSet && ServiceExists(MS_SMILEYADD_BATCHPARSE)) {
+		findSettingsInMap(hContact, qsUIN, qsProto);
+
+		if (settings.contains(qsUIN)) {
+			result = settings.value(qsUIN)->isShowSmileys();
+			if (result != cNotSet)
+				return result;
+		}
+		if (settings.contains(qsProto)) {
+			result = settings.value(qsProto)->isShowSmileys();
 			if (result != cNotSet)
 				return result;
 		}

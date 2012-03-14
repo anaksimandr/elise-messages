@@ -287,8 +287,9 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			if (options->isBBCodes())
 				replaceBBCodes(qsText);
 
-			//-- Workin with smileys         
-			replaceSmileys(qsText,isSent, event->hContact, szProto);
+			//-- Workin with smileys    
+			if (options->isShowSmileys())
+				replaceSmileys(qsText,isSent, event->hContact, szProto);
 
 			//-- Final step of making message
 			lastEvent.replace("%base%", options->currentTemplate->getRealTemplatePath());  // base URL
@@ -683,9 +684,10 @@ void HTMLBuilder::replaceSmileys(QString& text, bool isSent, HANDLE hContact, ch
 	SMADD_BATCHPARSE2 sp;
 	SMADD_BATCHPARSERES* spRes;
 
-	if (!ServiceExists(MS_SMILEYADD_BATCHPARSE)) {
+	//-- Moved to the build-contact-settings function
+	/*if (!ServiceExists(MS_SMILEYADD_BATCHPARSE)) {
 		return;
-	}
+	}*/
 	sp.cbSize = sizeof(sp);
 	sp.Protocolname = szProto;
 	sp.flag = SAFL_PATH | SAFL_UNICODE | (isSent ? SAFL_OUTGOING : 0);

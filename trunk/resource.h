@@ -15,4 +15,6 @@
 #define IDC_CHECKBOX_DATE                       1008
 #define IDC_CHECKBOX_DATEWORD                   1009
 #define IDC_CHECKBOX_DATERELAT                  1010
-#define IDC_COMBO_PROTO                         1011
+#define IDC_CHECKBOX_SMILEYS                    1011
+#define IDC_COMBO_PROTO                         1012
+#define IDC_BUTTON_DELPATH                      1013
