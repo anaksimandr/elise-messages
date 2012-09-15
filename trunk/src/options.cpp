@@ -413,7 +413,7 @@ HANDLE Options::wndToContact(HWND hwnd)
 	HANDLE hContact;
 	MessageWindowInputData mwid;
 	MessageWindowData mwod;
-	MessageBoxA(NULL, "1", "Debug", MB_OK);
+	//MessageBoxA(NULL, "1", "Debug", MB_OK);
 	//hwnd = GetParent(hwnd);
 	hContact = (HANDLE)CallService(MS_DB_CONTACT_FINDFIRST, 0, 0);
 	mwid.cbSize = sizeof(mwid);

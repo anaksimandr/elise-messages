@@ -47,6 +47,12 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">release\</IntDir>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</IgnoreImportLibrary>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">false</LinkIncremental>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <ClCompile>

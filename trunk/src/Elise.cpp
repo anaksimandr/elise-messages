@@ -157,7 +157,7 @@ void Elise::addToDoc()
 	//-- Add block to DOM
 	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(builder->getLastEvent());
 	//-- Now create and dispatch event EliseMessageInserted
-	webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript(" var elem = document.body; var evt = document.createEvent(\"MutationEvent\"); evt.initMutationEvent (\"EliseMessageInserted\", true, false, null, null, null, null, MutationEvent.MODIFICATION); elem.dispatchEvent(evt); ");
+	//webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript(" var elem = document.body; var evt = document.createEvent(\"MutationEvent\"); evt.initMutationEvent (\"EliseMessageInserted\", true, false, null, null, null, null, MutationEvent.MODIFICATION); elem.dispatchEvent(evt); ");
 		
 }
 
