@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Elise Messages Plugin for Miranda IM
 
 */
@@ -155,10 +155,44 @@ void Elise::reloadDoc()
 void Elise::addToDoc()
 {	
 	//-- Add block to DOM
-	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(builder->getLastEvent());
+//	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(builder->getLastEvent());
 	//-- Now create and dispatch event EliseMessageInserted
 	//webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript(" var elem = document.body; var evt = document.createEvent(\"MutationEvent\"); evt.initMutationEvent (\"EliseMessageInserted\", true, false, null, null, null, null, MutationEvent.MODIFICATION); elem.dispatchEvent(evt); ");
-		
+	
+	QString add = builder->getLastEvent();
+
+	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(add);
+
+	QRegExp rxScriptSplit = QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive);
+	QRegExp rxScriptReplace = QRegExp(".*<script([^>]*)>(.*)</script>.*", Qt::CaseInsensitive);
+	rxScriptSplit.setMinimal(true);
+
+	//QString qstrClass;
+	QString qstrSource;
+
+	for (int i=0; i<add.count(rxScriptSplit); i++) {
+		//qstrClass = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
+		//qstrSource = qstrClass;
+		qstrSource = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
+		//qstrClass.replace(rxScriptReplace, "\\1");
+		qstrSource.replace(rxScriptReplace, "\\2");
+		//if (qstrClass.isEmpty())
+		webView->page()->mainFrame()->documentElement().findFirst("body").lastChild().evaluateJavaScript(qstrSource);
+		/*else {
+		//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
+		//QVariant returned = webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
+		//QWebPage tmpPage;
+		//tmpPage.mainFrame()->setHtml(builder->getHead(), Options::getTemplateUrl());
+		//bufView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
+		QWebElement* elem =new QWebElement( webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]"));
+		elem->evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
+		QMessageBox qmes;
+		qmes.setText(elem->toPlainText());
+		qmes.exec();
+		//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").parent().setPlainText("<script>_getitall('ÃªÃ¥Ã­','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);</script>");
+		webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").setAttribute("class", "notAvailable");
+		}*/
+	}
 }
 
 void Elise::clear(IEVIEWEVENT* event)
@@ -170,14 +204,14 @@ void Elise::clear(IEVIEWEVENT* event)
 
 int Elise::getSelection(IEVIEWEVENT* event)
 {
-	// ÇÀÂÒĞÎÌİÍ!
+	// Ğ—ĞĞ’Ğ¢Ğ ĞĞœĞ­Ğ!
 	return 0;
 }
 
 void Elise::saveDocument()
 {
-	// TODO: ğåàëèçàöèÿ ñîõğàíåíèÿ ëîãà êàê ñòğàíèöû..
-	// ÂÑÅ ÁÓÄÅÒ ÑÄÅËÀÍÎ, ÍÎ ÇÀÂÒĞÎ! ÇÀÂÒĞÎÌİÍ!
+	// TODO: Ñ€ĞµĞ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ñ ÑĞ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ¸Ñ Ğ»Ğ¾Ğ³Ğ° ĞºĞ°Ğº ÑÑ‚Ñ€Ğ°Ğ½Ğ¸Ñ†Ñ‹..
+	// Ğ’Ğ¡Ğ• Ğ‘Ğ£Ğ”Ğ•Ğ¢ Ğ¡Ğ”Ğ•Ğ›ĞĞĞ, ĞĞ Ğ—ĞĞ’Ğ¢Ğ Ğ! Ğ—ĞĞ’Ğ¢Ğ ĞĞœĞ­Ğ!
 }
 
 void Elise::linkClicked(QUrl url)
