@@ -50,13 +50,13 @@
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">F:\Qt\4.8.0\lib;$(LibraryPath)</LibraryPath>
-    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">D:\buildenv\Qt5.0.0beta1\Desktop\Qt\5.0.0-beta1\msvc2010\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Qt\4.8.0\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Qt\4.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">F:\Sources\MirandaNG\bin10\lib;F:\Qt\4.8.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>"..\..\Qt\4.8.0\include\QtCore";"..\..\Qt\4.8.0\include\QtGui";"..\..\Qt\4.8.0\include\QtWebKit";"..\..\Qt\4.8.0\include";"..\qtwinmigrate\src";"..\..\Qt\4.8.0\include";"..\Miranda\miranda\include";"..\..\Qt\4.8.0\include\ActiveQt";"debug";..\..\Qt\4.8.0\mkspecs\default;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Qt\4.8.0\include\QtCore;..\..\Qt\4.8.0\include\QtGui;..\..\Qt\4.8.0\include\QtWebKit;..\..\Qt\4.8.0\include;..\qtwinmigrate\src;F:\Sources\MirandaNG\include;F:\Sources\MirandaNG\plugins\ExternalAPI;..\..\Qt\4.8.0\include\ActiveQt;"debug";..\..\Qt\4.8.0\mkspecs\default;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -96,7 +96,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>"..\..\Qt\4.8.0\include\QtCore";"..\..\Qt\4.8.0\include\QtGui";"..\..\Qt\4.8.0\include\QtWebKit";"..\..\Qt\4.8.0\include";"..\qtwinmigrate\src";"..\..\Qt\4.8.0\include";"..\Miranda\miranda\include";"..\..\Qt\4.8.0\include\ActiveQt";"release";..\..\Qt\4.8.0\mkspecs\default;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Qt\4.8.0\include\QtCore;..\..\Qt\4.8.0\include\QtGui;..\..\Qt\4.8.0\include\QtWebKit;..\..\Qt\4.8.0\include;..\qtwinmigrate\src;F:\Sources\MirandaNG\include;F:\Sources\MirandaNG\plugins\ExternalAPI;..\..\Qt\4.8.0\include\ActiveQt;"release";..\..\Qt\4.8.0\mkspecs\default;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -159,7 +159,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">release\moc_Elise.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="src\HTMLBuilder.h" />
-    <ClInclude Include="src\m_ieview.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\options.h" />
     <ClInclude Include="..\qtwinmigrate\src\qmfcapp.h" />

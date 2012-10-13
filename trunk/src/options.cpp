@@ -335,7 +335,7 @@ void Options::getUINs(HANDLE hContact, char* &uinIn, char* &uinOut) {
 		switch (ci.type) {
 		case CNFT_ASCIIZ:
 			mir_snprintf(buf, sizeof(buf), "%s", ci.pszVal);
-			miranda_sys_free(ci.pszVal);
+			mir_free(ci.pszVal);
 			break;
 		case CNFT_DWORD:
 			mir_snprintf(buf, sizeof(buf), "%u", ci.dVal);
@@ -349,7 +349,7 @@ void Options::getUINs(HANDLE hContact, char* &uinIn, char* &uinOut) {
 		switch (ci.type) {
 		case CNFT_ASCIIZ:
 			mir_snprintf(buf, sizeof(buf), "%s", ci.pszVal);
-			miranda_sys_free(ci.pszVal);
+			mir_free(ci.pszVal);
 			break;
 		case CNFT_DWORD:
 			mir_snprintf(buf, sizeof(buf), "%u", ci.dVal);
@@ -376,7 +376,7 @@ void Options::getUINs(HANDLE hContact, char* &uinIn) {
 		switch (ci.type) {
 		case CNFT_ASCIIZ:
 			mir_snprintf(buf, sizeof(buf), "%s", ci.pszVal);
-			miranda_sys_free(ci.pszVal);
+			mir_free(ci.pszVal);
 			break;
 		case CNFT_DWORD:
 			mir_snprintf(buf, sizeof(buf), "%u", ci.dVal);
@@ -443,11 +443,12 @@ HANDLE Options::wndToContact(HWND hwnd)
 void Options::buildProtocolList(HWND hwnd)
 {
 	int protoCount;
-	PROTOCOLDESCRIPTOR** pProtos;
+	//PROTOCOLDESCRIPTOR** pProtos;
+	PROTOACCOUNT** pProtos;
 	wchar_t* wszProto;
 
-	CallService(MS_PROTO_ENUMPROTOCOLS, (WPARAM)&protoCount, (LPARAM)&pProtos);
-	for (int i = 0; i < protoCount+1; i++) {
+	//CallService(MS_PROTO_ENUMPROTOCOLS, (WPARAM)&protoCount, (LPARAM)&pProtos);
+	/*for (int i = 0; i < protoCount+1; i++) {
 		if (i==0) {
 			wszProto = Utils::convertToWCS(Translate(ELISE_DEFAULT_OPT_N));
 			SendMessage(hwnd, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)wszProto);
@@ -463,7 +464,26 @@ void Options::buildProtocolList(HWND hwnd)
 			else
 				continue;
 		} //else
-	} //for
+	} //for*/
+	ProtoEnumAccounts(&protoCount, &pProtos);
+	for (int i = 0; i < protoCount+1; i++) {
+		//ProtocolSettings *proto;
+		//char tmpPath[MAX_PATH];
+		//char dbsName[256];
+		if (i==0) {
+			wszProto = Utils::convertToWCS(Translate(ELISE_DEFAULT_OPT_N));
+			SendMessage(hwnd, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)wszProto);
+		} else if (strcmp(pProtos[i-1]->szModuleName,"MetaContacts")) {
+			if ((CallProtoService(pProtos[i-1]->szModuleName, PS_GETCAPS, PFLAGNUM_1, 0) & PF1_IM) == 0) {
+				continue;
+			}
+			//proto = new ProtocolSettings(pProtos[i-1]->szModuleName);
+			wszProto = Utils::convertToWCS(pProtos[i-1]->szModuleName);
+			SendMessage(hwnd, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)wszProto);
+		} else {
+			continue;
+		}
+	}
 	delete wszProto;
 }
 
@@ -1236,10 +1256,34 @@ int Options::initOptions()
 {
 	//-- On init we must load default settings and settings for protocols
 	int protoCount;
-	PROTOCOLDESCRIPTOR** pProtos;
-	CallService(MS_PROTO_ENUMPROTOCOLS, (WPARAM)&protoCount, (LPARAM)&pProtos);
-	
+	//PROTOCOLDESCRIPTOR** pProtos;
+	PROTOACCOUNT **pProtos;
+	ProtoEnumAccounts(&protoCount, &pProtos);
+
+	ProtoEnumAccounts(&protoCount, &pProtos);
 	for (int i = 0; i < protoCount+1; i++) {
+		//ProtocolSettings *proto;
+		//char tmpPath[MAX_PATH];
+		//char dbsName[256];
+		if (i==0) {
+			loadSingleSettings(ELISE_DEFAULT_OPT, NULL);
+		}
+		else {
+			if (strcmp(pProtos[i-1]->szModuleName,"MetaContacts")) {
+				//-- hmmmm....
+				//if ((CallProtoService(pProtos[i-1]->szName, PS_GETCAPS, PFLAGNUM_1, 0) & PF1_IM) == 0) {
+				//	//continue;
+				//}
+				//MessageBoxA(NULL, pProtos[i-1]->szName, "Debug", MB_OK);
+				loadSingleSettings(pProtos[i-1]->szModuleName, NULL);
+			}
+			else
+				continue;
+		}
+	}
+	
+	//CallService(MS_PROTO_ENUMPROTOCOLS, (WPARAM)&protoCount, (LPARAM)&pProtos);	
+	/*for (int i = 0; i < protoCount+1; i++) {
 		if (i==0) {
 			loadSingleSettings(ELISE_DEFAULT_OPT, NULL);
 		}
@@ -1255,7 +1299,7 @@ int Options::initOptions()
 			else
 				continue;
 		} //else
-	} //for
+	} //for*/
 
 	return 0;
 }
@@ -1276,7 +1320,8 @@ int Options::initOptionsPage(WPARAM wParam, LPARAM lParam)
 		odp.pszTemplate = MAKEINTRESOURCEA(tabPages[i].dlgId);
 		odp.pfnDlgProc = tabPages[i].dlgProc;
 		odp.ptszTab = tabPages[i].tabName;
-		CallService(MS_OPT_ADDPAGE, wParam, (LPARAM) & odp);
+		//CallService(MS_OPT_ADDPAGE, wParam, (LPARAM) & odp);
+		Options_AddPage(wParam, &odp);
 	}
 	return 0;
 }
