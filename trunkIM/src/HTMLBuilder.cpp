@@ -588,7 +588,10 @@ void HTMLBuilder::getAvatar(HANDLE hContact, const char* szProto, QString& resul
 			ace = (struct avatarCacheEntry*)CallService(MS_AV_GETAVATARBITMAP, (WPARAM)hContact, (LPARAM)0);
 		}
 		if (ace!=NULL) {
-			result = QString::fromAscii(ace->szFilename);
+			//QDir dir = QDir(QString::fromAscii(ace->szFilename));
+			QDir dir = QDir(QString::fromStdWString(ace->szFilename));
+			//QMessageBox::critical(0, "", dir.absolutePath(), QMessageBox::Ok);
+			result =  dir.absolutePath();
 		}
 	}
 
