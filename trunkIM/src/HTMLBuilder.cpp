@@ -588,8 +588,8 @@ void HTMLBuilder::getAvatar(HANDLE hContact, const char* szProto, QString& resul
 			ace = (struct avatarCacheEntry*)CallService(MS_AV_GETAVATARBITMAP, (WPARAM)hContact, (LPARAM)0);
 		}
 		if (ace!=NULL) {
-			//QDir dir = QDir(QString::fromAscii(ace->szFilename));
-			QDir dir = QDir(QString::fromStdWString(ace->szFilename));
+			QDir dir = QDir(QString::fromAscii(ace->szFilename));
+			//QDir dir = QDir(QString::fromStdWString(ace->szFilename));
 			//QMessageBox::critical(0, "", dir.absolutePath(), QMessageBox::Ok);
 			result =  dir.absolutePath();
 		}
@@ -674,7 +674,7 @@ void HTMLBuilder::replaceURL(QString& text) {
 		//-- Get wide string (+10 characters at start and end, thought it's enough)
 		qstrBuf = text.mid(pos - 10, 10) + qstrCurURL + text.mid(pos + len, 10);
 		//-- If the wide string does not matche [img] bbcode
-		if (!TemplateMap::templateBBCodes["img"].exactMatch(qstrBuf))
+		if (TemplateMap::templateBBCodes["img"].indexIn(qstrBuf) == -1)		
 			//-- Replace matche with HTML-formated URL
 			text.replace(pos, len,"<a class=\"link\" target=\"_self\" href=\"\\1\">" + qstrCurURL + "</a>");
 		//-- Position incrementation

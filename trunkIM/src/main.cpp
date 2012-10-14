@@ -33,8 +33,34 @@ PLUGININFOEX pluginInfo={
 	{0x0d8f9af0, 0x5302, 0x11e0, { 0xb8, 0xaf, 0x08, 0x00, 0x20, 0x0c, 0x9a, 066 }} //0d8f9af0-5302-11e0-b8af-0800200c9a66
 };
 
+
+/*void myMessageOutput(QtMsgType type, const char *msg)
+{
+	QFile file("log.txt");
+	file.open(QIODevice::Append | QIODevice::Text);
+	QTextStream log(&file);
+	switch (type) {
+		case QtDebugMsg:
+			log << "Debug: " << msg << "\n";
+			break;
+		case QtWarningMsg:
+			log << "Warning: " << msg << "\n";
+			break;
+		case QtCriticalMsg:
+			log << "Critical: " << msg << "\n";
+			break;
+		case QtFatalMsg:
+			log << "Fatal: " << msg << "\n";
+			//abort();
+	}
+	log << "\n";
+	file.close();
+}*/
+
+
 extern "C" BOOL WINAPI DllMain(HINSTANCE hinstDLL,DWORD fdwReason,LPVOID lpvReserved)
 {
+	//qInstallMsgHandler(myMessageOutput);
 	// это нужно для работы гуев qt
 	ownApplication = QMfcApp::pluginInstance(hinstDLL);
 	//QTextCodec::setCodecForCStrings(QTextCodec::codecForName("windows-1251"));

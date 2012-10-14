@@ -674,7 +674,9 @@ void HTMLBuilder::replaceURL(QString& text) {
 		//-- Get wide string (+10 characters at start and end, thought it's enough)
 		qstrBuf = text.mid(pos - 10, 10) + qstrCurURL + text.mid(pos + len, 10);
 		//-- If the wide string does not matche [img] bbcode
-		if (!TemplateMap::templateBBCodes["img"].exactMatch(qstrBuf))
+		//if (!TemplateMap::templateBBCodes["img"].exactMatch(qstrBuf))
+		//-- oh, crap
+		if (TemplateMap::templateBBCodes["img"].indexIn(qstrBuf) == -1)
 			//-- Replace matche with HTML-formated URL
 			text.replace(pos, len,"<a class=\"link\" target=\"_self\" href=\"\\1\">" + qstrCurURL + "</a>");
 		//-- Position incrementation
