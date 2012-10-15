@@ -133,7 +133,7 @@ int TemplateMap::loadTemplate() {
 
 void TemplateMap::loadBBCodes() {
 
-	templateBBCodes["b"] = QRegExp("[[]b[]](.*)[[]/b[]]", Qt::CaseInsensitive);				// bolded text
+	/*templateBBCodes["b"] = QRegExp("[[]b[]](.*)[[]/b[]]", Qt::CaseInsensitive);				// bolded text
 	templateBBCodes["s"] = QRegExp("[[]s[]](.*)[[]/s[]]", Qt::CaseInsensitive);				// strikethrough text
 	templateBBCodes["i"] = QRegExp("[[]i[]](.*)[[]/i[]]", Qt::CaseInsensitive);				// italicized text
 	templateBBCodes["u"] = QRegExp("[[]u[]](.*)[[]/u[]]", Qt::CaseInsensitive);				// underlined text
@@ -141,7 +141,16 @@ void TemplateMap::loadBBCodes() {
 	templateBBCodes["code"] = QRegExp("[[]code[]](.*)[[]/code[]]", Qt::CaseInsensitive);	// monospaced text
 	templateBBCodes["quote"] = QRegExp("[[]quote[]](.*)[[]/quote[]]", Qt::CaseInsensitive);			// quoted text
 	templateBBCodes["size"] = QRegExp("[[]size=(\\d+)[]](.*)[[]/size[]]", Qt::CaseInsensitive);		// sized text
-	templateBBCodes["color"] = QRegExp("[[]color=(.+)[]](.*)[[]/color[]]", Qt::CaseInsensitive);	// colored text
+	templateBBCodes["color"] = QRegExp("[[]color=(.+)[]](.*)[[]/color[]]", Qt::CaseInsensitive);	// colored text*/
+	templateBBCodes["b"] = QRegExp("\\[b\\](.*)\\[/b\\]", Qt::CaseInsensitive);				// bolded text
+	templateBBCodes["s"] = QRegExp("\\[s\\](.*)\\[/s\\]", Qt::CaseInsensitive);				// strikethrough text
+	templateBBCodes["i"] = QRegExp("\\[i\\](.*)\\[/i\\]", Qt::CaseInsensitive);				// italicized text
+	templateBBCodes["u"] = QRegExp("\\[u\\](.*)\\[/u\\]", Qt::CaseInsensitive);				// underlined text
+	templateBBCodes["img"] = QRegExp("\\[img\\](.*)\\[/img\\]", Qt::CaseInsensitive);		// image
+	templateBBCodes["code"] = QRegExp("\\[code\\](.*)\\[/code\\]", Qt::CaseInsensitive);	// monospaced text
+	templateBBCodes["quote"] = QRegExp("\\[quote\\](.*)\\[/quote\\]", Qt::CaseInsensitive);			// quoted text
+	templateBBCodes["size"] = QRegExp("\\[size=([^\\]\\[]+)\\](.*)\\[/size\\]", Qt::CaseInsensitive);		// sized text
+	templateBBCodes["color"] = QRegExp("\\[color=([^\\]\\[]+)\\](.*)\\[/color\\]", Qt::CaseInsensitive);	// colored text
 
 	templateBBCodes["b"].setMinimal(true);
 	templateBBCodes["s"].setMinimal(true);

@@ -296,8 +296,8 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			lastEvent.replace("%time%", qsTime);          // event's time
 			lastEvent.replace("%date%", qsDate);          // event's date
 			lastEvent.replace("%cid%", qsUIN);            // contact's ID or user's ID (depends on context)
-			lastEvent.replace("%cidIn%", qsUINIn);          // user's ID
-			lastEvent.replace("%cidOut%", qsUINOut);         // contact's ID
+			lastEvent.replace("%cidIn%", qsUINIn);        // user's ID
+			lastEvent.replace("%cidOut%", qsUINOut);      // contact's ID
 			lastEvent.replace("%avatar%", qsAvatar);      // link to contact's picture file or user's picure file (depends on context)
 			lastEvent.replace("%avatarIn%", qsAvatarIn);  // link to contact's picture
 			lastEvent.replace("%avatarOut%",qsAvatarOut); // link to user's picture
