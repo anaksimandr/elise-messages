@@ -703,18 +703,30 @@ void HTMLBuilder::replaceSmileys(QString& text, bool isSent, HANDLE hContact, ch
 	wszText[text.size()] = 0;
 	sp.str = (wchar_t*)wszText;
 	
+	QMap<QString, QString> list;
+	QString str;
+
 	sp.hContact = hContact;
 	spRes = (SMADD_BATCHPARSERES*) CallService(MS_SMILEYADD_BATCHPARSE, 0, (LPARAM)&sp);
 	int last_pos = 0;
 	if (spRes != NULL) {
 		for (int i = 0; i < (int)sp.numSmileys; i++) {
 			if (spRes[i].filepath != NULL && strlen((char*)spRes[i].filepath) > 0) {
-				text.replace(spRes[i].startChar, spRes[i].size, "<img class=\"img\" style=\"max-width:100%;\" src=\"" + QString::fromWCharArray(spRes[i].filepath) + "\" >");
-				last_pos = spRes[i].startChar + spRes[i].size;
+				//text.replace(spRes[i].startChar, spRes[i].size, "<img class=\"img\" style=\"max-width:100%;\" src=\"" + QString::fromWCharArray(spRes[i].filepath) + "\" >");
+				//last_pos = spRes[i].startChar + spRes[i].size;
+				str = text.mid(spRes[i].startChar, spRes[i].size);
+				if (!list.contains(str))
+					list.insert(str, QString::fromWCharArray(spRes[i].filepath));
 			}
 		}
+		QMap<QString, QString>::const_iterator i = list.constBegin();
+		while (i != list.constEnd())
+		{
+			text.replace(i.key(), "<img class=\"img\" style=\"max-width:100%;\" src=\"" + i.value() + "\" >");
+			i++;
+		}
 		CallService(MS_SMILEYADD_BATCHFREE, 0, (LPARAM)spRes);
-		
+
 	}
 	delete[] wszText;
 	return;
