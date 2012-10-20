@@ -295,9 +295,10 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			lastEvent.replace("%base%", options->currentTemplate->getRealTemplatePath());  // base URL
 			lastEvent.replace("%time%", qsTime);          // event's time
 			lastEvent.replace("%date%", qsDate);          // event's date
+			lastEvent.replace("%uin%", qsUIN);            // contact's ID or user's ID (depends on context)
 			lastEvent.replace("%cid%", qsUIN);            // contact's ID or user's ID (depends on context)
-			lastEvent.replace("%cidIn%", qsUINIn);          // user's ID
-			lastEvent.replace("%cidOut%", qsUINOut);         // contact's ID
+			lastEvent.replace("%cidIn%", qsUINIn);        // user's ID
+			lastEvent.replace("%cidOut%", qsUINOut);      // contact's ID
 			lastEvent.replace("%avatar%", qsAvatar);      // link to contact's picture file or user's picure file (depends on context)
 			lastEvent.replace("%avatarIn%", qsAvatarIn);  // link to contact's picture
 			lastEvent.replace("%avatarOut%",qsAvatarOut); // link to user's picture
@@ -306,6 +307,22 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			lastEvent.replace("%nameOut%", qsNameOut);    // users's name
 			lastEvent.replace("%proto%", QString::fromAscii(szProto)); // protocol name
 			lastEvent.replace("%text%", qsText);          // event's text
+			//-- For using in scripts
+			lastEvent.replace("%\\base%", "'" + options->currentTemplate->getRealTemplatePath() + "'");  // base URL
+			lastEvent.replace("%\\time%", "'" + qsTime + "'");            // event's time
+			lastEvent.replace("%\\date%", "'" + qsDate + "'");            // event's date
+			lastEvent.replace("%\\uin%", "'" + qsUIN + "'");              // contact's ID or user's ID (depends on context)
+			//lastEvent.replace("%\\cid%", "'" + qsUIN + "'");            // contact's ID or user's ID (depends on context)
+			//lastEvent.replace("%\\cidIn%", "'" + qsUINIn + "'");        // user's ID
+			//lastEvent.replace("%\\cidOut%", "'" + qsUINOut + "'");      // contact's ID
+			//lastEvent.replace("%\\avatar%", "'" + qsAvatar + "'");      // link to contact's picture file or user's picure file (depends on context)
+			//lastEvent.replace("%\\avatarIn%", "'" + qsAvatarIn + "'");  // link to contact's picture
+			//lastEvent.replace("%\\avatarOut%","'" + qsAvatarOut + "'"); // link to user's picture
+			lastEvent.replace("%\\name%", "'" + qsName + "'");            // contact's name or user's name (depends on context)
+			//lastEvent.replace("%\\nameIn%", "'" + qsNameIn + "'");      // contact's name
+			//lastEvent.replace("%\\nameOut%", "'" + qsNameOut + "'";     // users's name
+			lastEvent.replace("%\\proto%", "'" + QString::fromAscii(szProto) + "'"); // protocol name
+			lastEvent.replace("%\\text%", "'" + qsText + "'");            // event's text
 			//parentView->addToDoc(lastEvent);
 			if (isHistory)
 				history += lastEvent;
@@ -647,7 +664,7 @@ void HTMLBuilder::replaceBBCodes(QString& text) {
 	text.replace(TemplateMap::templateBBCodes["s"], "<s>\\1</s>");
 	text.replace(TemplateMap::templateBBCodes["i"], "<i>\\1</i>");
 	text.replace(TemplateMap::templateBBCodes["u"], "<u>\\1</u>");
-	text.replace(TemplateMap::templateBBCodes["img"], "<div><img class=\"img\" style=\"max-width:100%;\" src=\"\\1\" ></div>");
+	text.replace(TemplateMap::templateBBCodes["img"], "<div><img class=\"img\" style=\"max-width:100%;\" src=\"\\1\" /></div>");
 	text.replace(TemplateMap::templateBBCodes["code"], "<tt>\\1</tt>");
 	text.replace(TemplateMap::templateBBCodes["quote"], "<blockquote>\\1</blockquote>");
 	text.replace(TemplateMap::templateBBCodes["size"], "<span style=\"font-size:\\1pt;\">\\2</span>");

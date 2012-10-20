@@ -161,9 +161,21 @@ void Elise::addToDoc()
 	
 	QString add = builder->getLastEvent();
 
-	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(add);
+	//add.replace("\"", "\\\"");
+	//add.replace("\'", "\\\'");
+	//webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("$('body').html(\"" + add + "\"); null;");
+	//webbView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("$('body').html(\"<div>test</div>\"); null;");
+	webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("var $bodyy=$('body'); null;");
+	webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("$bodyy.append('<div>1</div>');");
 
-	QRegExp rxScriptSplit = QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive);
+	//-- Великий костыль, дай мне силу!
+	//-- Почини яваскрипт, убери лаги и глюки!
+	//add.replace(QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive), "<img class=\"noImg\" style=\"position: absolute;\" src=\"\img/1.png\" onload=\"\\2\" />");
+	//add.replace(QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive), "<img class=\"noImg\" style=\"position: absolute;\" src=\"\" onload=\"\\2\" />");
+	//QMessageBox::critical(this, "Debug", add, QMessageBox::Ok);
+	//webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(add);
+
+	/*QRegExp rxScriptSplit = QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive);
 	QRegExp rxScriptReplace = QRegExp(".*<script([^>]*)>(.*)</script>.*", Qt::CaseInsensitive);
 	rxScriptSplit.setMinimal(true);
 
@@ -191,8 +203,8 @@ void Elise::addToDoc()
 		qmes.exec();
 		//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").parent().setPlainText("<script>_getitall('êåí','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);</script>");
 		webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").setAttribute("class", "notAvailable");
-		}*/
-	}
+		}*//*
+	}*/
 }
 
 void Elise::clear(IEVIEWEVENT* event)
