@@ -277,7 +277,7 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			getTime(qsTime, qsDate, eventData->time);
 			
 			//-- New lines
-			qsText.replace("\n", "<br>\n");
+			qsText.replace("\n", " <br>\n");
 
 			//-- Workin with url's
 			if (options->isURLParse())
@@ -691,13 +691,13 @@ void HTMLBuilder::replaceURL(QString& text) {
 		//-- Get wide string (+10 characters at start and end, thought it's enough)
 		qstrBuf = text.mid(pos - 10, 10) + qstrCurURL + text.mid(pos + len, 10);
 		//-- If the wide string does not matche [img] bbcode
-		//if (!TemplateMap::templateBBCodes["img"].exactMatch(qstrBuf))
-		//-- oh, crap
-		if (TemplateMap::templateBBCodes["img"].indexIn(qstrBuf) == -1)
+		if (TemplateMap::templateBBCodes["img"].indexIn(qstrBuf) == -1) {
 			//-- Replace matche with HTML-formated URL
-			text.replace(pos, len,"<a class=\"link\" target=\"_self\" href=\"\\1\">" + qstrCurURL + "</a>");
+			qstrBuf = "<a class=\"link\" target=\"_self\" href=\"" + qstrCurURL + "\">" + qstrCurURL + "</a>";
+			text.replace(pos, len, qstrBuf);
+		}
 		//-- Position incrementation
-		pos += len;
+		pos += qstrBuf.length();
 	}
 }
 

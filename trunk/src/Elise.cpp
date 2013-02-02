@@ -85,6 +85,7 @@ QMyWebView::QMyWebView(QWidget* parentWidget, Elise* elise)
 QMyWebView::~QMyWebView()
 {
 	//inspector->~QWebInspector();
+	delete inspector;
 }
 
 void QMyWebView::contextMenuEvent(QContextMenuEvent* e)
