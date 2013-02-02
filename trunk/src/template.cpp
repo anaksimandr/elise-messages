@@ -63,6 +63,9 @@ static const QString templateNames[templatesNumber] = {
 
 int TemplateMap::loadTemplate() {	
 	inited = false;
+	bJQueryUse = false;
+	//-- Clean
+	templateMap.clear();
 	//groupsSupported = false;
 	filesInOut = false;
 	urlInOut = false;
@@ -87,7 +90,8 @@ int TemplateMap::loadTemplate() {
 					templateMap[tmplName] = tmplBuf;
 				tmplBuf.clear();
 				tmplName = bufTrim;
-				if (!parseInited) parseInited = true;
+				if (!parseInited)
+					parseInited = true;
 			}
 		}
 		// иначе продолжаем запись старого
@@ -97,7 +101,7 @@ int TemplateMap::loadTemplate() {
 	templateMap[tmplName] = tmplBuf;
 	inited = true;
 
-	//-- Now chech group support
+	//-- Now check group support
 	/*if (templateMap.contains("<!--MessageInGroupStart-->"))
 	if (templateMap.contains("<!--MessageInGroupStart-->"))
 	if (templateMap.contains("<!--MessageInGroupInner-->"))
@@ -126,6 +130,9 @@ int TemplateMap::loadTemplate() {
 	if (templateMap.contains("<!--URLOut-->"))
 	if (templateMap.contains("<!--hURLOut-->"))
 		urlInOut = true;
+
+	if (templateMap.value("<!--HTMLStart-->").contains("<!--JQuery==true-->", Qt::CaseInsensitive))
+		bJQueryUse = true;
 
 	return 0;
 }

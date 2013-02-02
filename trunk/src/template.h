@@ -20,6 +20,7 @@ private:
 	bool			inited;
 	bool			filesInOut;
 	bool			urlInOut;
+	bool			bJQueryUse;
 public:
 	TemplateMap();
 	TemplateMap(TemplateMap* other);
@@ -32,10 +33,11 @@ public:
 	void			setTemplatePath(QString* path);
 	void			setTemplatePath(wchar_t pszPath[MAX_PATH]);
 
-	bool			isTemplateInited() {return inited;};
+	inline bool		isTemplateInited() {return inited;};
 	//bool			isGroupsSup() {return groupsSupported;};
-	bool			isFilesInOut() {return filesInOut;};
-	bool			isURLInOut() {return urlInOut;};
+	inline bool		isFilesInOut() { return filesInOut; }
+	inline bool		isURLInOut() { return urlInOut; }
+	inline bool		isJQueryUsed() { return bJQueryUse; }
 
 	QMap<QString, QString> templateMap;
 	int				loadTemplate();

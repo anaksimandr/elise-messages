@@ -8,6 +8,7 @@ Elise Messages Plugin for Miranda IM
 #include "utils.h"
 #include "options.h"
 #include "services.h"
+#include <QWebElement>
 
 Elise* Elise::list = NULL;
 CRITICAL_SECTION Elise::mutex;
@@ -153,58 +154,49 @@ void Elise::reloadDoc()
 }
 
 void Elise::addToDoc()
-{	
-	//-- Add block to DOM
-//	webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(builder->getLastEvent());
-	//-- Now create and dispatch event EliseMessageInserted
-	//webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript(" var elem = document.body; var evt = document.createEvent(\"MutationEvent\"); evt.initMutationEvent (\"EliseMessageInserted\", true, false, null, null, null, null, MutationEvent.MODIFICATION); elem.dispatchEvent(evt); ");
-	
+{
+	//QFile file("log.txt");
+	//file.open(QIODevice::Append | QIODevice::Text);
+	//QTextStream log(&file);
+
 	QString add = builder->getLastEvent();
+	QWebElement bodyElem = webView->page()->mainFrame()->documentElement().findFirst("body");
 
-	//add.replace("\"", "\\\"");
-	//add.replace("\'", "\\\'");
-	//webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("$('body').html(\"" + add + "\"); null;");
-	//webbView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("$('body').html(\"<div>test</div>\"); null;");
-	webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("var $bodyy=$('body'); null;");
-	webView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("$bodyy.append('<div>1</div>');");
+	//log << add << "\n-----------------\n";
 
-	//-- Великий костыль, дай мне силу!
-	//-- Почини яваскрипт, убери лаги и глюки!
-	//add.replace(QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive), "<img class=\"noImg\" style=\"position: absolute;\" src=\"\img/1.png\" onload=\"\\2\" />");
-	//add.replace(QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive), "<img class=\"noImg\" style=\"position: absolute;\" src=\"\" onload=\"\\2\" />");
-	//QMessageBox::critical(this, "Debug", add, QMessageBox::Ok);
-	//webView->page()->mainFrame()->documentElement().findFirst("body").appendInside(add);
+	//-- Add block to DOM
+	if (Options::isJQueryUsed(builder->getContact())) {
+		//-- If JQuery supported
+		//add = "<!--MessageIn--><div>1</div><div>2</div>";
+		//log << add << "\n-----------------\n";
+		//add.replace("'", "\"");
+		//add.replace("\"", "&#034");
 
-	/*QRegExp rxScriptSplit = QRegExp("<script([^>]*)>([^>]*)</script>", Qt::CaseInsensitive);
-	QRegExp rxScriptReplace = QRegExp(".*<script([^>]*)>(.*)</script>.*", Qt::CaseInsensitive);
-	rxScriptSplit.setMinimal(true);
+		//-- Without it JQuery will not work
+		add.remove("\n", Qt::CaseInsensitive);
 
-	//QString qstrClass;
-	QString qstrSource;
-
-	for (int i=0; i<add.count(rxScriptSplit); i++) {
-		//qstrClass = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
-		//qstrSource = qstrClass;
-		qstrSource = add.section(rxScriptSplit, i, i, QString::SectionIncludeTrailingSep);
-		//qstrClass.replace(rxScriptReplace, "\\1");
-		qstrSource.replace(rxScriptReplace, "\\2");
-		//if (qstrClass.isEmpty())
-		webView->page()->mainFrame()->documentElement().findFirst("body").lastChild().evaluateJavaScript(qstrSource);
-		/*else {
-		//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
-		//QVariant returned = webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").evaluateJavaScript(qstrSource);
-		//QWebPage tmpPage;
-		//tmpPage.mainFrame()->setHtml(builder->getHead(), Options::getTemplateUrl());
-		//bufView->page()->mainFrame()->documentElement().findFirst("body").evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
-		QWebElement* elem =new QWebElement( webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]"));
-		elem->evaluateJavaScript("_getitall('testtesttest','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);");
-		QMessageBox qmes;
-		qmes.setText(elem->toPlainText());
-		qmes.exec();
-		//webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").parent().setPlainText("<script>_getitall('êåí','anaksimandr','anaksimandr@jabber.ru','F:\Miranda\miranda-im-v0.9.34-unicode\Skins\IEView\testSkin\myskin.ivt',meldungsart[0]);</script>");
-		webView->page()->mainFrame()->documentElement().findFirst("body").findFirst("script[class=first]").setAttribute("class", "notAvailable");
-		}*//*
-	}*/
+		//QString eval = 
+		add =
+			"var $bodyy=$('body');"
+			"$bodyy.append('" + add + "');"
+			"null;"
+			;
+		//log << eval << "\n-----------------\n";
+		bodyElem.evaluateJavaScript(add);
+	}
+	else {
+		bodyElem.appendInside(add);
+	}
+	//-- Now create and dispatch event EliseMessageInserted
+	bodyElem.evaluateJavaScript(
+			" var elem = document.body;"
+			" var evt = document.createEvent(\"MutationEvent\");"
+			" evt.initMutationEvent (\"EliseMessageInserted\", true, false, null, null, null, null, MutationEvent.MODIFICATION);"
+			" elem.dispatchEvent(evt);"
+			" null;"
+			);
+	//log << "\n==================================\n";
+	//file.close();
 }
 
 void Elise::clear(IEVIEWEVENT* event)

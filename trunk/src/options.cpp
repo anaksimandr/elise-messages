@@ -231,6 +231,7 @@ SingleOptions::SingleOptions()
 	cWordDate = cNotSet;
 	cRelativeTime = cNotSet;
 	cShowSmileys = cNotSet;
+//	bJQueryUse = false;
 }
 
 SingleOptions::SingleOptions(SingleOptions* other)
@@ -247,13 +248,13 @@ SingleOptions::SingleOptions(SingleOptions* other)
 	cWordDate = other->isWordDate();
 	cShowSmileys = other->isShowSmileys();
 	cRelativeTime = other->isRelativeTime();
-
+//	bJQueryUse = other->isJQueryUsed();
 }
 
 SingleOptions::SingleOptions(HANDLE hContact)
 {
 	currentTemplate = Options::isTemplateInited(hContact);
-
+	//bJQueryUse = Options::
 	cBBCodes = Options::isBBCodes(hContact);
 	cURLParse = Options::isURLParse(hContact);
 	cMessageGrouping = Options::isMessageGrouping(hContact);
@@ -1250,6 +1251,30 @@ unsigned char Options::isShowSmileys(HANDLE hContact)
 
 	return 0;
 }
+bool Options::isJQueryUsed(HANDLE hContact)
+{
+	QString qsProto;
+	QString qsUIN;
+	TemplateMap* result;
+
+	findSettingsInMap(hContact, qsUIN, qsProto);
+
+	//-- First, check contact settings
+	if (settings.contains(qsUIN)) {
+		result = settings.value(qsUIN)->currentTemplate;
+		if (result->isTemplateInited())
+			return result->isJQueryUsed();
+	}
+	//-- Then check protocol settings
+	if (settings.contains(qsProto)) {
+		result = settings.value(qsProto)->currentTemplate;
+		if (result->isTemplateInited())
+			return result->isJQueryUsed();
+	}
+	//-- The last try is checking default settings
+	return settings.value(QString::fromAscii(ELISE_DEFAULT_OPT))->currentTemplate->isJQueryUsed();
+	//return result;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int Options::initOptions()
@@ -1315,7 +1340,7 @@ int Options::initOptionsPage(WPARAM wParam, LPARAM lParam)
 	odp.ptszGroup = _T("Message Sessions");
 	odp.ptszTitle = _T("Elise Messages");
 	odp.flags = ODPF_BOLDGROUPS | ODPF_TCHAR;
-	odp.nIDBottomSimpleControl = 0;
+	//odp.nIDBottomSimpleControl = 0;
 	for (i = 0; i < SIZEOF(tabPages); i++) {
 		odp.pszTemplate = MAKEINTRESOURCEA(tabPages[i].dlgId);
 		odp.pfnDlgProc = tabPages[i].dlgProc;

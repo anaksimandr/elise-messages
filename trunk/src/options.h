@@ -50,6 +50,7 @@ private:
 	unsigned char	cWordDate;
 	unsigned char	cRelativeTime;
 	unsigned char	cShowSmileys;
+	//bool			bJQueryUse;
 public:
 	TemplateMap*	currentTemplate;
 
@@ -69,6 +70,7 @@ public:
 	inline unsigned char	isWordDate() {return cWordDate;};
 	inline unsigned char	isRelativeTime() {return cRelativeTime;};
 	inline unsigned char	isShowSmileys() {return cShowSmileys;};
+	//inline bool				isJQueryUsed() { return bJQueryUse; }
 
 	//-- Setters
 	inline void			setBBcodes(unsigned char val) {cBBCodes = val;};
@@ -81,6 +83,7 @@ public:
 	inline void			setWordDate(unsigned char val) {cWordDate = val;};
 	inline void			setRelativeTime(unsigned char val) {cRelativeTime = val;};
 	inline void			setShowSmileys(unsigned char val) {cShowSmileys = val;};
+	//inline void			setJQueryUsed(bool used) { bJQueryUse = used; };
 }; //SingleOptions
 
 class Options {
@@ -174,6 +177,7 @@ public:
 	static unsigned char	isWordDate(HANDLE hContact);
 	static unsigned char	isRelativeTime(HANDLE hContact);
 	static unsigned char	isShowSmileys(HANDLE hContact);
+	static bool				isJQueryUsed(HANDLE hContact);
 
 	static int		initOptions();
 	inline static QMap<QString, SingleOptions*>*	getSettingsMap() {return &settings;};

@@ -93,15 +93,15 @@ HTMLBuilder::~HTMLBuilder() {
 	options->~SingleOptions();
 }
 
-HANDLE HTMLBuilder::getContact()
+/*HANDLE HTMLBuilder::getContact()
 {
 	return hContact;
-}
+}*/
 
-HWND HTMLBuilder::getParent()
+/*HWND HTMLBuilder::getParent()
 {
 	return parent;
-}
+}*/
 
 void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 {
@@ -308,21 +308,21 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			lastEvent.replace("%proto%", QString::fromAscii(szProto)); // protocol name
 			lastEvent.replace("%text%", qsText);          // event's text
 			//-- For using in scripts
-			lastEvent.replace("%\\base%", "'" + options->currentTemplate->getRealTemplatePath() + "'");  // base URL
-			lastEvent.replace("%\\time%", "'" + qsTime + "'");            // event's time
-			lastEvent.replace("%\\date%", "'" + qsDate + "'");            // event's date
-			lastEvent.replace("%\\uin%", "'" + qsUIN + "'");              // contact's ID or user's ID (depends on context)
-			//lastEvent.replace("%\\cid%", "'" + qsUIN + "'");            // contact's ID or user's ID (depends on context)
-			//lastEvent.replace("%\\cidIn%", "'" + qsUINIn + "'");        // user's ID
-			//lastEvent.replace("%\\cidOut%", "'" + qsUINOut + "'");      // contact's ID
-			//lastEvent.replace("%\\avatar%", "'" + qsAvatar + "'");      // link to contact's picture file or user's picure file (depends on context)
-			//lastEvent.replace("%\\avatarIn%", "'" + qsAvatarIn + "'");  // link to contact's picture
-			//lastEvent.replace("%\\avatarOut%","'" + qsAvatarOut + "'"); // link to user's picture
-			lastEvent.replace("%\\name%", "'" + qsName + "'");            // contact's name or user's name (depends on context)
-			//lastEvent.replace("%\\nameIn%", "'" + qsNameIn + "'");      // contact's name
-			//lastEvent.replace("%\\nameOut%", "'" + qsNameOut + "'";     // users's name
-			lastEvent.replace("%\\proto%", "'" + QString::fromAscii(szProto) + "'"); // protocol name
-			lastEvent.replace("%\\text%", "'" + qsText + "'");            // event's text
+			lastEvent.replace("%\\base%", "\"" + options->currentTemplate->getRealTemplatePath() + "\"");  // base URL
+			lastEvent.replace("%\\time%", "\"" + qsTime + "\"");            // event's time
+			lastEvent.replace("%\\date%", "\"" + qsDate + "\"");            // event's date
+			lastEvent.replace("%\\uin%", "\"" + qsUIN + "\"");              // contact's ID or user's ID (depends on context)
+			//lastEvent.replace("%\\cid%", "\"" + qsUIN + "\"");            // contact's ID or user's ID (depends on context)
+			//lastEvent.replace("%\\cidIn%", "\"" + qsUINIn + "\"");        // user's ID
+			//lastEvent.replace("%\\cidOut%", "\"" + qsUINOut + "\"");      // contact's ID
+			//lastEvent.replace("%\\avatar%", "\"" + qsAvatar + "\"");      // link to contact's picture file or user's picure file (depends on context)
+			//lastEvent.replace("%\\avatarIn%", "\"" + qsAvatarIn + "\"");  // link to contact's picture
+			//lastEvent.replace("%\\avatarOut%","\"" + qsAvatarOut + "\""); // link to user's picture
+			lastEvent.replace("%\\name%", "\"" + qsName + "\"");            // contact's name or user's name (depends on context)
+			//lastEvent.replace("%\\nameIn%", "\"" + qsNameIn + "\"");      // contact's name
+			//lastEvent.replace("%\\nameOut%", "\"" + qsNameOut + "\"";     // users's name
+			lastEvent.replace("%\\proto%", "\"" + QString::fromAscii(szProto) + "\""); // protocol name
+			lastEvent.replace("%\\text%", "\"" + qsText + "\"");            // event's text
 			//parentView->addToDoc(lastEvent);
 			if (isHistory)
 				history += lastEvent;

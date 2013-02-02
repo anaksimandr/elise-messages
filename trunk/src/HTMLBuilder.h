@@ -44,6 +44,7 @@ private:
 	SingleOptions*	options;
 	IEVIEWEVENT		lastIEViewEvent;
 	time_t			startedTime;
+	//bool			jQueryUse;
 	void			getTime(QString& qsTime, QString& qsDate, time_t time);
 	bool			isSameDate(time_t time1, time_t time2);
 	void			getAvatar(HANDLE hContact, const char* szProto, QString& result);
@@ -65,8 +66,9 @@ public:
 	HTMLBuilder(Elise* view, HWND hwndParent);
 	~HTMLBuilder();
 
-	HANDLE			getContact();
-	HWND			getParent();
+	//inline bool		isJQueryUsed() { return jQueryUse; }
+	inline HANDLE	getContact() { return hContact; }
+	inline HWND		getParent() { return parent; }
 	QString			getHead();
 	QString			getLastEvent();
 	QString			getHistory();

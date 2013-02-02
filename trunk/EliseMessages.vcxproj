@@ -72,10 +72,11 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
       <AdditionalDependencies>user32.lib;f:\Qt\4.8.0\lib\QtWebKitd4.lib;f:\Qt\4.8.0\lib\QtGuid4.lib;f:\Qt\4.8.0\lib\QtCored4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>f:\Qt\4.8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>F:\Sources\MirandaNG\bin10\lib;f:\Qt\4.8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
