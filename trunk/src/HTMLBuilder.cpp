@@ -692,8 +692,28 @@ void HTMLBuilder::replaceURL(QString& text) {
 		qstrBuf = text.mid(pos - 10, 10) + qstrCurURL + text.mid(pos + len, 10);
 		//-- If the wide string does not matche [img] bbcode
 		if (TemplateMap::templateBBCodes["img"].indexIn(qstrBuf) == -1) {
-			//-- Replace matche with HTML-formated URL
-			qstrBuf = "<a class=\"link\" target=\"_self\" href=\"" + qstrCurURL + "\">" + qstrCurURL + "</a>";
+			//-- see http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif
+			QRegExp rxImage = QRegExp("([^?#]*\\.(?:jpg|gif|png))(?:\\?([^#]*))?(?:#(.*))?");
+			//-- see http://stackoverflow.com/questions/4977233/regexp-to-find-youtube-url-strip-off-parameters-and-return-clean-video-url
+			QRegExp rxYouTube = QRegExp("(((ht)tp(s?))\\://)?([w]{3}\\.)?(youtu(\\.)?be\\.?)([a-z]{2,4})?/?((/watch\\?v=)|/embed/)?([a-zA-Z0-9_-]+)(\\&feature=)?([a-zA-Z0-9_-]+)?");
+			//-- TODO: make options for advanced URL parsing
+			if (true && (rxImage.indexIn(qstrCurURL, 0) != -1))
+			{
+				qstrBuf = "<div><img class=\"img\" style=\"max-width:100%;\" src=\"" + qstrCurURL + "\" /></div>";
+			}
+			else
+			{
+				//-- TODO: make options for advanced URL parsing
+				if (true && (rxYouTube.indexIn(qstrCurURL, 0) != -1))
+				{
+					qstrBuf = "<iframe width=\"100%\" height=\"315\" frameborder=\"0\" allowfullscreen src=\"http://www.youtube.com/embed/" + rxYouTube.cap(11) + "\" ></iframe>";
+				} 
+				else
+				{
+					//-- Replace matche with HTML-formated URL
+					qstrBuf = "<a class=\"link\" target=\"_self\" href=\"" + qstrCurURL + "\">" + qstrCurURL + "</a>";
+				}
+			}
 			text.replace(pos, len, qstrBuf);
 		}
 		//-- Position incrementation

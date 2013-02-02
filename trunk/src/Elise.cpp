@@ -33,6 +33,8 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy, bool showIt)
 
 	hwnd = mainWnd->winId();
 
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+	webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
 	webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 	webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
 	webView->settings()->setMaximumPagesInCache(0);
@@ -157,33 +159,18 @@ void Elise::reloadDoc()
 
 void Elise::addToDoc()
 {
-	//QFile file("log.txt");
-	//file.open(QIODevice::Append | QIODevice::Text);
-	//QTextStream log(&file);
-
 	QString add = builder->getLastEvent();
 	QWebElement bodyElem = webView->page()->mainFrame()->documentElement().findFirst("body");
-
-	//log << add << "\n-----------------\n";
 
 	//-- Add block to DOM
 	if (Options::isJQueryUsed(builder->getContact())) {
 		//-- If JQuery supported
-		//add = "<!--MessageIn--><div>1</div><div>2</div>";
-		//log << add << "\n-----------------\n";
-		//add.replace("'", "\"");
-		//add.replace("\"", "&#034");
-
 		//-- Without it JQuery will not work
 		add.remove("\n", Qt::CaseInsensitive);
 
-		//QString eval = 
-		add =
-			"var $bodyy=$('body');"
+		add = "var $bodyy=$('body');"
 			"$bodyy.append('" + add + "');"
-			"null;"
-			;
-		//log << eval << "\n-----------------\n";
+			"null;";
 		bodyElem.evaluateJavaScript(add);
 	}
 	else {
@@ -197,8 +184,6 @@ void Elise::addToDoc()
 			" elem.dispatchEvent(evt);"
 			" null;"
 			);
-	//log << "\n==================================\n";
-	//file.close();
 }
 
 void Elise::clear(IEVIEWEVENT* event)
