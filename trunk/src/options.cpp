@@ -1337,7 +1337,7 @@ int Options::initOptionsPage(WPARAM wParam, LPARAM lParam)
 	odp.cbSize = sizeof(odp);
 	odp.position = 0;
 	odp.hInstance = hEliseInst;
-	odp.ptszGroup = _T("Message Sessions");
+	odp.ptszGroup = _T("Skins");
 	odp.ptszTitle = _T("Elise Messages");
 	odp.flags = ODPF_BOLDGROUPS | ODPF_TCHAR;
 	//odp.nIDBottomSimpleControl = 0;
