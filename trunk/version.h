@@ -1,7 +1,7 @@
 #define __MAJOR_VERSION				0
 #define __MINOR_VERSION				0
 #define __RELEASE_NUM				0
-#define __BUILD_NUM					11
+#define __BUILD_NUM					13
 
 #define __FILEVERSION_STRING		__MAJOR_VERSION,__MINOR_VERSION,__RELEASE_NUM,__BUILD_NUM
 #define __FILEVERSION_DOTS			__MAJOR_VERSION.__MINOR_VERSION.__RELEASE_NUM.__BUILD_NUM
@@ -25,4 +25,4 @@
 #define __AUTHOR					"anaksimandr"
 #define __AUTHOREMAIL				"s.andreenko@gmail.com"
 #define __AUTHORWEB					"http://miranda-planet.com/"
-#define __COPYRIGHT					"© 2012 anaksimandr"
+#define __COPYRIGHT					"© 2013 anaksimandr"

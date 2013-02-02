@@ -23,7 +23,7 @@ class QMyWebView : public QWebView {
     Q_OBJECT
 private:
     Elise*			parent;
-	//QWebInspector*	inspector;
+	QWebInspector*	inspector;
     virtual void	contextMenuEvent(QContextMenuEvent* e);
 public slots:
     void			callWebInspector();

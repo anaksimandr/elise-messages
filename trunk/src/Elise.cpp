@@ -36,7 +36,7 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy, bool showIt)
 	webView->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 	webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
 	webView->settings()->setMaximumPagesInCache(0);
-	//webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+	webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
 	webView->setHtml(builder->getHead(), builder->getTemplateUrl());
 
@@ -79,6 +79,7 @@ QMyWebView::QMyWebView(QWidget* parentWidget, Elise* elise)
 {
 	this->setParent(parentWidget);
 	parent = elise;
+	inspector = 0;
 }
 
 QMyWebView::~QMyWebView()
@@ -303,16 +304,16 @@ void Elise::ReleaseEliseMessages()
 
 void QMyWebView::callWebInspector()
 {
-	//if (!inspector) {
-	//	inspector = new QWebInspector();
-	//	inspector->setPage(this->page());
-	//	inspector->resize(800, 600);
-	//}
-	//inspector->show();
+	if (!inspector) {
+		inspector = new QWebInspector();
+		inspector->setPage(this->page());
+		inspector->resize(800, 600);
+	}
+	inspector->show();
 	
-	QTextEdit* view = new QTextEdit();
+	/*QTextEdit* view = new QTextEdit();
     view->resize(500, 500);
     view->setWindowTitle("HTML code");
     view->setText(parent->getHTML());
-    view->show();
+    view->show();*/
 }
