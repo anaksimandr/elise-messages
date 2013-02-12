@@ -57,10 +57,10 @@ private:
 	bool			isDbEventShown(DWORD dwFlags, DBEVENTINFO* dbei);
 	bool			isDbEventShown(DBEVENTINFO* dbei);
 	wchar_t*		getContactName(HANDLE hContact, const char* szProto);
-	DWORD			getLastEventTime();
-	void			setLastEventTime(DWORD);
-	int				getLastEventType();
-	void			setLastEventType(int);
+	inline DWORD	getLastEventTime() { return lastEventTime; }
+	inline void		setLastEventTime(DWORD t) { lastEventTime = t; }
+	inline int		getLastEventType() { return iLastEventType; }
+	inline void		setLastEventType(int t) { iLastEventType = t; }
 	//void addToDoc();
 public:
 	HTMLBuilder(Elise* view, HWND hwndParent);
@@ -69,10 +69,10 @@ public:
 	//inline bool		isJQueryUsed() { return jQueryUse; }
 	inline HANDLE	getContact() { return hContact; }
 	inline HWND		getParent() { return parent; }
-	QString			getHead();
-	QString			getLastEvent();
-	QString			getHistory();
-	QUrl			getTemplateUrl();
+	inline QString	getHead() { return header + footer; }
+	inline QString	getLastEvent() { return lastEvent; }
+	inline QString	getHistory() { return header + history + footer; }
+	inline QUrl		getTemplateUrl() { return options->currentTemplate->getTemplateUrl(); }
 	//QString			getDocument();
 	//void			setDocument(QString doc);
 	void			initHead();
@@ -80,7 +80,7 @@ public:
 	void			appendEventOld(Elise*, IEVIEWEVENT* event);
 	void			appendEventNew(Elise* view, IEVIEWEVENT* event);
 	//void			appendEvent(Elise*, IEVIEWEVENT* event);
-	time_t			getStartedTime();
+	inline time_t	getStartedTime() { return startedTime; }
 };
 
 

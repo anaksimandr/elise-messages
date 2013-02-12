@@ -9,6 +9,8 @@ Elise Messages Plugin for Miranda IM
 #include "options.h"
 #include "services.h"
 #include <QWebElement>
+#include <m_netlib.h>
+//#include <qnetwork.h>
 
 Elise* Elise::list = NULL;
 CRITICAL_SECTION Elise::mutex;
@@ -27,9 +29,19 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy, bool showIt)
 	webView = new QMyWebView(mainWnd, this);
 	//bufView = new QWebView();
 
+	QNetworkProxy proxy;
+	proxy.setType(QNetworkProxy::HttpProxy);
+	proxy.setHostName("192.168.100.1");
+	proxy.setPort(8088);
+	proxy.setUser("anon");
+	proxy.setPassword("123321QS");
+	//QNetworkProxy::setApplicationProxy(proxy);
+	webView->page()->networkAccessManager()->setProxy(proxy);
+
 	webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 	QObject::connect(webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)),
-		Qt::DirectConnection);	
+		Qt::DirectConnection);
+	//QObject::connect(webView, &QWebView::linkClicked, this, &Elise::linkClicked);
 
 	hwnd = mainWnd->winId();
 
@@ -39,6 +51,23 @@ Elise::Elise(HWND parent, int x, int y, int cx, int cy, bool showIt)
 	webView->settings()->setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
 	webView->settings()->setMaximumPagesInCache(0);
 	webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
+	/*NETLIBUSERSETTINGS proxy_settings;
+	proxy_settings.cbSize = sizeof(proxy_settings);
+
+	NETLIBUSER usr;
+	usr.cbSize = sizeof(usr);
+	usr.flags = NUF_HTTPCONNS | NUF_NOHTTPSOPTION | NUF_OUTGOING | NUF_NOOPTIONS;
+	usr.szSettingsModule = "dummy";
+
+	//-- Get proxy and use it if exists
+	int test = CallService(MS_NETLIB_GETUSERSETTINGS, NULL, (LPARAM)(NETLIBUSERSETTINGS*)&proxy_settings);
+	if (test != 0)
+	{
+		QMessageBox::critical(this, "debug", QString::fromLatin1(proxy_settings.szProxyServer), QMessageBox::Ok);	
+		QMessageBox::critical(this, "debug", "sdf", QMessageBox::Ok);	
+	}
+	QMessageBox::critical(this, "debug", QString::number(test), QMessageBox::Ok);*/
 
 	webView->setHtml(builder->getHead(), builder->getTemplateUrl());
 
@@ -167,6 +196,8 @@ void Elise::addToDoc()
 		//-- If JQuery supported
 		//-- Without it JQuery will not work
 		add.remove("\n", Qt::CaseInsensitive);
+		add.replace("\\", "\\\\");
+		add.replace("'", "\'");
 
 		add = "var $bodyy=$('body');"
 			"$bodyy.append('" + add + "');"

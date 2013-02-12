@@ -277,7 +277,7 @@ void HTMLBuilder::appendEventTemplate(Elise* view, IEVIEWEVENT* event)
 			getTime(qsTime, qsDate, eventData->time);
 			
 			//-- New lines
-			qsText.replace("\n", " <br>\n");
+			qsText.replace("\n", " <br>");
 
 			//-- Workin with url's
 			if (options->isURLParse())
@@ -677,7 +677,8 @@ void HTMLBuilder::replaceURL(QString& text) {
 	//((mailto\:|(news|(ht|f)tp(s?))\://){1}\S+) - source, not working in qt and not match url, that begins like "www..."
 	//text.replace(QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)(?!"), "<a class=\"link\" target=\"_self\" href=\"\\1\">\\1</a>");
 	//-- Create URL regExp
-	QRegExp rx = QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)");
+	//QRegExp rx = QRegExp("((((mailto\:|(news|(ht|f)tp(s?))\://))|www)\\S+)");
+	QRegExp rx = QRegExp("((mailto:|((ht|f)tp(s?)://)|www\\.)\\S+)");
 	QString qstrBuf;
 	QString qstrCurURL;
 	int pos = 0;
@@ -695,7 +696,8 @@ void HTMLBuilder::replaceURL(QString& text) {
 			//-- see http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif
 			QRegExp rxImage = QRegExp("([^?#]*\\.(?:jpg|gif|png))(?:\\?([^#]*))?(?:#(.*))?");
 			//-- see http://stackoverflow.com/questions/4977233/regexp-to-find-youtube-url-strip-off-parameters-and-return-clean-video-url
-			QRegExp rxYouTube = QRegExp("(((ht)tp(s?))\\://)?([w]{3}\\.)?(youtu(\\.)?be\\.?)([a-z]{2,4})?/?((/watch\\?v=)|/embed/)?([a-zA-Z0-9_-]+)(\\&feature=)?([a-zA-Z0-9_-]+)?");
+			QRegExp rxYouTube = QRegExp("(((ht)tp(s?))://)?([w]{3}\\.)?(youtu(\\.)?be\\.?)([a-z]{2,4})?/?((/watch\\?v=)|/embed/)?([a-zA-Z0-9_-]+)(\\&feature=)?([a-zA-Z0-9_-]+)?");
+			//QRegExp rxVK = QRegExp("((ht)tp(s?)\://)?([w]{3}\.)?vk\.(com|ru)/([a-zA-Z0-9_-]+)");
 			//-- TODO: make options for advanced URL parsing
 			if (true && (rxImage.indexIn(qstrCurURL, 0) != -1))
 			{
@@ -710,8 +712,16 @@ void HTMLBuilder::replaceURL(QString& text) {
 				} 
 				else
 				{
-					//-- Replace matche with HTML-formated URL
-					qstrBuf = "<a class=\"link\" target=\"_self\" href=\"" + qstrCurURL + "\">" + qstrCurURL + "</a>";
+					//-- TODO: make options for advanced URL parsing
+					//if (true && rxVK.indexIn(qstrCurURL, 0) != -1)
+					//{
+					//	qstrBuf = "<iframe width=\"100%\" height=\"315\" frameborder=\"0\" allowfullscreen src=\"" + qstrCurURL + "\" ></iframe>";
+					//}
+					//else
+					//{
+						//-- Replace matche with HTML-formated URL
+						qstrBuf = "<a class=\"link\" target=\"_self\" href=\"" + qstrCurURL + "\">" + qstrCurURL + "</a>";
+					//}
 				}
 			}
 			text.replace(pos, len, qstrBuf);
@@ -829,15 +839,6 @@ bool HTMLBuilder::isDbEventShown(DBEVENTINFO* dbei) {
 	return isDbEventShown(dwFlags2, dbei);
 }
 
-time_t HTMLBuilder::getStartedTime() {
-	return startedTime;
-}
-
-QUrl HTMLBuilder::getTemplateUrl()
-{
-	return options->currentTemplate->getTemplateUrl();
-}
-
 void HTMLBuilder::initHead()
 {
 	if (options->currentTemplate->isTemplateInited()) {
@@ -902,20 +903,6 @@ void HTMLBuilder::initHead()
 		header = noTemplate;
 }
 
-QString HTMLBuilder::getLastEvent() {
-	//return header + document + lastEvent + "</body></html>";
-	return lastEvent;
-}
-
-QString HTMLBuilder::getHead() {
-	//return header + document + lastEvent + "</body></html>";
-	return header + footer;
-}
-
-QString HTMLBuilder::getHistory() {
-	return header + history + footer;
-}
-
 void HTMLBuilder::clearDoc(IEVIEWEVENT* event) {
 	header.clear();
 	footer.clear();
@@ -928,20 +915,4 @@ void HTMLBuilder::clearDoc(IEVIEWEVENT* event) {
 	if (lastIEViewEvent.pszProto != NULL || event->hContact == NULL) {
 		setLastEventType(-1);
 	}
-}
-
-int HTMLBuilder::getLastEventType() {
-	return iLastEventType;
-}
-
-void HTMLBuilder::setLastEventType(int t) {
-	iLastEventType = t;
-}
-
-DWORD HTMLBuilder::getLastEventTime() {
-	return lastEventTime;
-}
-
-void HTMLBuilder::setLastEventTime(DWORD t) {
-	lastEventTime = t;
 }
