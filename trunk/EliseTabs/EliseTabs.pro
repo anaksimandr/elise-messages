@@ -26,3 +26,11 @@ HEADERS += \
 SOURCES += \
 	src/main.cpp \
 	src/elisetabs.cpp
+
+
+CONFIG (debug, debug|release) {
+	DESTDIR = ../Plugins/EliseTabs/Debug
+
+}else{
+	DESTDIR = ../Plugins/EliseTabs/Release
+}
