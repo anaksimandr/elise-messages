@@ -1,4 +1,4 @@
-QT  += quick widgets
+QT  += qml quick widgets
 TARGET  = EliseTabs
 TEMPLATE	= app
 #TEMPLATE    = lib
@@ -14,11 +14,14 @@ DEFINES += UNICODE
 #win32:LIBS += \
 #	path/to/Psapi.lib
 
-OTHER_FILES += \
-    res/qml/mainWindow.qml
+#OTHER_FILES += \
+#	res/qml/mainWindow.qml \
+#	res/qml/LeftBorder.qml \
+#	res/qml/RightBorder.qml \
+#	res/qml/BottomBorder.qml \
+#	res/qml/BottomRightBorder.qml
 
-RESOURCES += \
-    res/res.qrc
+RESOURCES +=
 
 HEADERS += \
 	src/elisetabs.h
@@ -27,10 +30,20 @@ SOURCES += \
 	src/main.cpp \
 	src/elisetabs.cpp
 
-
 CONFIG (debug, debug|release) {
 	DESTDIR = ../Plugins/EliseTabs/Debug
 
 }else{
 	DESTDIR = ../Plugins/EliseTabs/Release
 }
+
+# Add more folders to ship with the application, here
+folder_01.source = res/img
+folder_01.target = $$DESTDIR/
+folder_02.source = res/qml
+folder_02.target = $$DESTDIR/
+DEPLOYMENTFOLDERS = folder_01 folder_02
+
+# Please do not modify the following two lines. Required for deployment.
+include(qml.pri)
+qtcAddDeployment()

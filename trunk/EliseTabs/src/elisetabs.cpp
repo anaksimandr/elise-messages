@@ -24,7 +24,7 @@ EliseTabs::EliseTabs()
 	view->setClearBeforeRendering(true);
 	view->setColor(QColor(Qt::transparent));
 
-	view->setSource(QUrl("qrc:/qml/mainWindow.qml"));
+	view->setSource(QUrl("qml/mainWindow.qml"));
 	view->setResizeMode(QQuickView::SizeRootObjectToView);
 	//view->setResizeMode(QQuickView::SizeViewToRootObject);
 	view->show();
@@ -53,6 +53,44 @@ void EliseTabs::setCursorShape(Qt::CursorShape cursorShape)
 	emit cursorShapeChanged();
 
 	currentShape = cursorShape;
+}
+
+void EliseTabs::moveLeft(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setWidth(view->width() + (oldPos.x() - newPos.x()));
+	view->setX(view->x() + (newPos.x() - oldPos.x()));
+}
+
+void EliseTabs::moveTop(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setHeight(view->height() + (oldPos.y() - newPos.y()));
+	view->setY(view->y() + (newPos.y() - oldPos.y()));
+}
+
+void EliseTabs::moveRight(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setWidth(view->width() + (newPos.x() - oldPos.x()));
+}
+
+void EliseTabs::moveRightBottom(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setWidth(view->width() + (newPos.x() - oldPos.x()));
+	view->setHeight(view->height() + (newPos.y() - oldPos.y()));
+}
+
+void EliseTabs::moveBottom(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setHeight(view->height() + (newPos.y() - oldPos.y()));
 }
 
 /*QPoint EliseTabs::getPos()
