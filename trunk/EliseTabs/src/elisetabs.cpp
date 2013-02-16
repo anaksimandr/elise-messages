@@ -27,6 +27,7 @@ EliseTabs::EliseTabs()
 	view->setSource(QUrl("qml/mainWindow.qml"));
 	view->setResizeMode(QQuickView::SizeRootObjectToView);
 	//view->setResizeMode(QQuickView::SizeViewToRootObject);
+
 	view->show();
 	QQmlContext* context = view->engine()->rootContext();
 	context->setContextProperty("_window", this);
@@ -59,16 +60,35 @@ void EliseTabs::moveLeft(QPoint newPos, QPoint oldPos)
 {
 	newPos = view->mapToGlobal(newPos);
 	oldPos = view->mapToGlobal(oldPos);
-	view->setWidth(view->width() + (oldPos.x() - newPos.x()));
 	view->setX(view->x() + (newPos.x() - oldPos.x()));
+	view->setWidth(view->width() + (oldPos.x() - newPos.x()));
+}
+
+void EliseTabs::moveLeftTop(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setX(view->x() + (newPos.x() - oldPos.x()));
+	view->setY(view->y() + (newPos.y() - oldPos.y()));
+	view->setWidth(view->width() + (oldPos.x() - newPos.x()));
+	view->setHeight(view->height() + (oldPos.y() - newPos.y()));
 }
 
 void EliseTabs::moveTop(QPoint newPos, QPoint oldPos)
 {
 	newPos = view->mapToGlobal(newPos);
 	oldPos = view->mapToGlobal(oldPos);
-	view->setHeight(view->height() + (oldPos.y() - newPos.y()));
 	view->setY(view->y() + (newPos.y() - oldPos.y()));
+	view->setHeight(view->height() + (oldPos.y() - newPos.y()));
+}
+
+void EliseTabs::moveTopRight(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setY(view->y() + (newPos.y() - oldPos.y()));
+	view->setHeight(view->height() + (oldPos.y() - newPos.y()));
+	view->setWidth(view->width() + (newPos.x() - oldPos.x()));
 }
 
 void EliseTabs::moveRight(QPoint newPos, QPoint oldPos)
@@ -90,6 +110,15 @@ void EliseTabs::moveBottom(QPoint newPos, QPoint oldPos)
 {
 	newPos = view->mapToGlobal(newPos);
 	oldPos = view->mapToGlobal(oldPos);
+	view->setHeight(view->height() + (newPos.y() - oldPos.y()));
+}
+
+void EliseTabs::moveBottomLeft(QPoint newPos, QPoint oldPos)
+{
+	newPos = view->mapToGlobal(newPos);
+	oldPos = view->mapToGlobal(oldPos);
+	view->setX(view->x() + (newPos.x() - oldPos.x()));
+	view->setWidth(view->width() + (oldPos.x() - newPos.x()));
 	view->setHeight(view->height() + (newPos.y() - oldPos.y()));
 }
 

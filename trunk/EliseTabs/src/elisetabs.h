@@ -29,10 +29,13 @@ public:
 	Qt::CursorShape		cursorShape() const;
 	Q_INVOKABLE void	setCursorShape(Qt::CursorShape cursorShape);
 	Q_INVOKABLE void	moveLeft(QPoint newPos, QPoint oldPos);
+	Q_INVOKABLE void	moveLeftTop(QPoint newPos, QPoint oldPos);
 	Q_INVOKABLE void	moveTop(QPoint newPos, QPoint oldPos);
+	Q_INVOKABLE void	moveTopRight(QPoint newPos, QPoint oldPos);
 	Q_INVOKABLE void	moveRight(QPoint newPos, QPoint oldPos);
 	Q_INVOKABLE void	moveRightBottom(QPoint newPos, QPoint oldPos);
 	Q_INVOKABLE void	moveBottom(QPoint newPos, QPoint oldPos);
+	Q_INVOKABLE void	moveBottomLeft(QPoint newPos, QPoint oldPos);
 
 signals:
 	//void	posChanged(QPoint);
