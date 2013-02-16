@@ -14,12 +14,6 @@ DEFINES += UNICODE
 #win32:LIBS += \
 #	path/to/Psapi.lib
 
-#OTHER_FILES += \
-#	res/qml/mainWindow.qml \
-#	res/qml/LeftBorder.qml \
-#	res/qml/RightBorder.qml \
-#	res/qml/BottomBorder.qml \
-#	res/qml/BottomRightBorder.qml
 
 RESOURCES +=
 
@@ -47,3 +41,14 @@ DEPLOYMENTFOLDERS = folder_01 folder_02
 # Please do not modify the following two lines. Required for deployment.
 include(qml.pri)
 qtcAddDeployment()
+
+OTHER_FILES += \
+	res/qml/mainWindow.qml \
+	res/qml/border/LeftBorder.qml \
+    res/qml/border/LeftTopBorder.qml \
+	res/qml/border/TopBorder.qml \
+	res/qml/border/TopRightBorder.qml \
+	res/qml/border/RightBorder.qml \
+	res/qml/border/RightBottomBorder.qml \
+	res/qml/border/BottomBorder.qml \
+	res/qml/border/BottomLeftBorder.qml

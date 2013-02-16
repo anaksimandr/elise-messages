@@ -1,5 +1,7 @@
 import QtQuick 2.0
 
+import "border"
+
 Rectangle {
     width: 100
     height: 100
@@ -31,10 +33,14 @@ Rectangle {
         }
     }
 
+    //-- Border
     LeftBorder { }
+    LeftTopBorder { }
     TopBorder { }
+    TopRightBorder { }
     RightBorder { }
-    BottomRightBorder { }
+    RightBottomBorder { }
     BottomBorder { }
+    BottomLeftBorder { }
 
 }
