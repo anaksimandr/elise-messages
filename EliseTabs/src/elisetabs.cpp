@@ -10,6 +10,7 @@ EliseTabs::EliseTabs()
 	//QApplication app();
 	view = new QQuickView();
 	view->connect(view->engine(), &QQmlEngine::quit, QApplication::quit);
+	currentShape = -1;
 
 	/*setWindowFlags(Qt::FramelessWindowHint);
 	setAttribute(Qt::WA_TranslucentBackground);
@@ -28,15 +29,30 @@ EliseTabs::EliseTabs()
 	//view->setResizeMode(QQuickView::SizeViewToRootObject);
 	view->show();
 	QQmlContext* context = view->engine()->rootContext();
-	//context->setContextProperty("_mainWindow", this);
-
-	context->setContextProperty("_mainWindow", view);
+	context->setContextProperty("_window", this);
+	context->setContextProperty("_view", view);
 
 }
 
 EliseTabs::~EliseTabs()
 {
 	delete view;
+}
+
+Qt::CursorShape EliseTabs::cursorShape() const
+{
+	return view->cursor().shape();
+}
+
+void EliseTabs::setCursorShape(Qt::CursorShape cursorShape)
+{
+	if (currentShape == (int)cursorShape)
+		return;
+
+	view->setCursor(cursorShape);
+	emit cursorShapeChanged();
+
+	currentShape = cursorShape;
 }
 
 /*QPoint EliseTabs::getPos()

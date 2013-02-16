@@ -13,9 +13,11 @@ class EliseTabs : public QObject
 	//Q_PROPERTY(QString name READ name WRITE setName
 	//		   NOTIFY nameChanged)
 	//Q_PROPERTY(QPoint pos READ getPos WRITE setPos NOTIFY posChanged)
-	//Q_PROPERTY(QSize size READ getSize WRITE setSize)
+	Q_PROPERTY(Qt::CursorShape cursorShape READ cursorShape WRITE setCursorShape
+			   NOTIFY cursorShapeChanged)
 private:
 	QQuickView*	view;
+	int			currentShape;
 public:
 	EliseTabs();
 	~EliseTabs();
@@ -24,9 +26,12 @@ public:
 	//QPoint	getPos();
 	//void	setPos(QPoint);
 	//void	setSize(QSize);
+	Qt::CursorShape		cursorShape() const;
+	Q_INVOKABLE void	setCursorShape(Qt::CursorShape cursorShape);
 
 signals:
-	void	posChanged(QPoint);
+	//void	posChanged(QPoint);
+	void	cursorShapeChanged();
 };
 
 #endif // ELISETABS_MAINWINDOW_H_
