@@ -37,6 +37,9 @@ public:
 	Q_INVOKABLE void	moveBottom(QPoint newPos, QPoint oldPos);
 	Q_INVOKABLE void	moveBottomLeft(QPoint newPos, QPoint oldPos);
 
+	Q_INVOKABLE void	close();
+	Q_INVOKABLE void	minimize();
+
 signals:
 	//void	posChanged(QPoint);
 	void	cursorShapeChanged();

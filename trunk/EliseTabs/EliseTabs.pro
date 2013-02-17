@@ -43,7 +43,6 @@ include(qml.pri)
 qtcAddDeployment()
 
 OTHER_FILES += \
-	res/qml/mainWindow.qml \
 	res/qml/border/LeftBorder.qml \
     res/qml/border/LeftTopBorder.qml \
 	res/qml/border/TopBorder.qml \
@@ -51,4 +50,7 @@ OTHER_FILES += \
 	res/qml/border/RightBorder.qml \
 	res/qml/border/RightBottomBorder.qml \
 	res/qml/border/BottomBorder.qml \
-	res/qml/border/BottomLeftBorder.qml
+	res/qml/border/BottomLeftBorder.qml \
+	res/qml/border/Button.qml \
+    res/qml/MainViewBorder.qml \
+    res/qml/MainView.qml

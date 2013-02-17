@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDesktopWidget>
 //#include <QQuickWindow>
 #include <QQuickView>
 #include <QQmlEngine>
@@ -17,16 +18,24 @@ EliseTabs::EliseTabs()
 	setAttribute(Qt::WA_NoSystemBackground);
 	view = new QmlView(this);
 	view->viewport()->setAutoFillBackground(false);*/
+
+	view->setFlags(Qt::Fr);
 	view->setFlags(Qt::FramelessWindowHint);
+
 	//QSurfaceFormat format;
 	//format.setAlphaBufferSize(8);
 	//view->setFormat(format);
 	view->setClearBeforeRendering(true);
 	view->setColor(QColor(Qt::transparent));
 
-	view->setSource(QUrl("qml/mainWindow.qml"));
+	view->setSource(QUrl("qml/MainViewBorder.qml"));
 	view->setResizeMode(QQuickView::SizeRootObjectToView);
 	//view->setResizeMode(QQuickView::SizeViewToRootObject);
+
+	view->resize(750, 550);
+	QRect d = QApplication::desktop()->screenGeometry();
+	view->setX(d.width() / 2 - view->width() / 2);
+	view->setY(d.height() / 2 - view->height() / 2);
 
 	view->show();
 	QQmlContext* context = view->engine()->rootContext();
@@ -38,6 +47,16 @@ EliseTabs::EliseTabs()
 EliseTabs::~EliseTabs()
 {
 	delete view;
+}
+
+void EliseTabs::close()
+{
+	QApplication::exit();
+}
+
+void EliseTabs::minimize()
+{
+	view->setWindowState(Qt::WindowMinimized);
 }
 
 Qt::CursorShape EliseTabs::cursorShape() const

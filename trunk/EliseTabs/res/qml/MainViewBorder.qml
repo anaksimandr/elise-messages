@@ -3,8 +3,6 @@ import QtQuick 2.0
 import "border"
 
 Rectangle {
-    width: 100
-    height: 100
     color: "#00000000"
     //color: "#FFFFFFFF"
     //opacity: 0.1
@@ -33,6 +31,13 @@ Rectangle {
         }
     }
 
+    MainView {
+        anchors {
+            fill: parent;
+            margins: 5;
+        }
+    }
+
     //-- Border
     LeftBorder { }
     LeftTopBorder { }
@@ -42,5 +47,34 @@ Rectangle {
     RightBottomBorder { }
     BottomBorder { }
     BottomLeftBorder { }
+
+    //property int buttonPosStep: 40
+    //property int buttonPosBegin: 15
+
+    Button {
+        id: buttonClose
+        anchors {
+            top: parent.top;
+            right: parent.right;
+            rightMargin: 5;
+        }
+
+        label: "close"
+
+        onButtonClick: _window.close()
+    }
+
+    Button {
+        id: buttonMinimize
+        anchors {
+            top: parent.top;
+            right: buttonClose.left;
+            rightMargin: 0;
+        }
+
+        label: "min"
+
+        onButtonClick: _window.minimize()
+    }
 
 }
