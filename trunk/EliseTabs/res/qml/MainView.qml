@@ -1,11 +1,9 @@
 import QtQuick 2.0
 
-Rectangle {
+TabWidget {
+    id: tabs
+    width: 640; height: 480
 
-    color: "Red"
-    //color: "#FFFFFFFF"
-    //opacity: 0.1
-    smooth: true
-
-
+    TabItem { }
+    TabItem { }
 }

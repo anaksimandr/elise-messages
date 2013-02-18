@@ -53,4 +53,5 @@ OTHER_FILES += \
 	res/qml/border/BottomLeftBorder.qml \
 	res/qml/border/Button.qml \
     res/qml/MainViewBorder.qml \
-    res/qml/MainView.qml
+	res/qml/MainView.qml \
+	res/qml/TabWidget.qml

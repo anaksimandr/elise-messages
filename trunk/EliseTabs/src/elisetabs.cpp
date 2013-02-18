@@ -1,16 +1,19 @@
-#include <QApplication>
-#include <QDesktopWidget>
-//#include <QQuickWindow>
-#include <QQuickView>
-#include <QQmlEngine>
-#include <QQmlContext>
+//#include <QApplication>
+#include <QGuiApplication>
+//#include <QDesktopWidget>
+#include <QScreen>
+//#include <QQuickView>
+//#include <QQmlEngine>
+//#include <QQmlContext>
+#include <QtQuick/QtQuick>
 #include "elisetabs.h"
 
 EliseTabs::EliseTabs()
 {
 	//QApplication app();
 	view = new QQuickView();
-	view->connect(view->engine(), &QQmlEngine::quit, QApplication::quit);
+	//view->connect(view->engine(), &QQmlEngine::quit, QApplication::quit);
+	view->connect(view->engine(), &QQmlEngine::quit, QGuiApplication::quit);
 	currentShape = -1;
 
 	/*setWindowFlags(Qt::FramelessWindowHint);
@@ -19,8 +22,11 @@ EliseTabs::EliseTabs()
 	view = new QmlView(this);
 	view->viewport()->setAutoFillBackground(false);*/
 
-	view->setFlags(Qt::Fr);
-	view->setFlags(Qt::FramelessWindowHint);
+	view->setFlags(Qt::FramelessWindowHint
+				   | Qt::WindowSystemMenuHint
+				   | Qt::WindowMinimizeButtonHint
+				   | Qt::Window);
+	//view->setFlags(Qt::FramelessWindowHint);
 
 	//QSurfaceFormat format;
 	//format.setAlphaBufferSize(8);
@@ -32,8 +38,10 @@ EliseTabs::EliseTabs()
 	view->setResizeMode(QQuickView::SizeRootObjectToView);
 	//view->setResizeMode(QQuickView::SizeViewToRootObject);
 
-	view->resize(750, 550);
-	QRect d = QApplication::desktop()->screenGeometry();
+	//view->resize(750, 550);
+	view->resize(200, 150);
+	//QRect d = QApplication::desktop()->screenGeometry();
+	QRect d = QGuiApplication::primaryScreen()->geometry();
 	view->setX(d.width() / 2 - view->width() / 2);
 	view->setY(d.height() / 2 - view->height() / 2);
 
@@ -51,13 +59,21 @@ EliseTabs::~EliseTabs()
 
 void EliseTabs::close()
 {
-	QApplication::exit();
+	QGuiApplication::exit();
 }
 
-void EliseTabs::minimize()
+void EliseTabs::addTab()
+{
+	QObject* obj = view->rootObject()->findChild<QObject*>("tabs");
+
+	QQmlComponent* newItem = new QQmlComponent(view->engine(), "qml/TabItem.qml", obj);
+}
+
+/*void EliseTabs::minimize()
 {
 	view->setWindowState(Qt::WindowMinimized);
-}
+	//view->showMinimized();
+}*/
 
 Qt::CursorShape EliseTabs::cursorShape() const
 {
