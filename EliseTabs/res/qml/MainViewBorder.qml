@@ -74,7 +74,19 @@ Rectangle {
 
         label: "min"
 
-        onButtonClick: _window.minimize()
+        //onButtonClick: _window.minimize()
+        onButtonClick: _view.showMinimized();
+    }
+
+    Button {
+        id: testButton
+        anchors {
+            top: parent.top;
+            right: buttonMinimize.left;
+            rightMargin: 0;
+        }
+        label: "test"
+        onButtonClick: _window.addTab();
     }
 
 }

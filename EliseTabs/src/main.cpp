@@ -1,4 +1,5 @@
-#include <QApplication>
+//#include <QApplication>
+#include <QGuiApplication>
 #include "elisetabs.h"
 
 /*#ifndef NDEBUG
@@ -32,8 +33,10 @@ int main(int argc, char* argv[])
 /*#ifndef NDEBUG
 	qInstallMessageHandler(messageOutput);
 #endif //NDEBUG*/
-	QApplication app(argc, argv);
-	app.setQuitOnLastWindowClosed(true);
+	//QApplication app(argc, argv);
+	//app.setQuitOnLastWindowClosed(true);
+	QGuiApplication app(argc, argv);
+
 
 	new EliseTabs();
 
