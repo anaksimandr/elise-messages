@@ -7,6 +7,7 @@
 //#include <QQmlContext>
 #include <QtQuick/QtQuick>
 #include "elisetabs.h"
+#include <assert.h>
 
 EliseTabs::EliseTabs()
 {
@@ -62,11 +63,30 @@ void EliseTabs::close()
 	QGuiApplication::exit();
 }
 
+/*QQuickItem* findChild(QQuickItem* parent)
+{
+	QList<QQuickItem*>* list = parent->childItems();
+
+	QObject* item;
+	QList<QQuickItem*>::const_iterator itemsIterator = list->constBegin();
+	QList<QQuickItem*>::const_iterator endI = list->constEnd();
+	while (itemsIterator != endI) {
+		item = qobject_cast<QObject*>(*itemsIterator);
+		if (QQmlProperty(item, ""))
+		++itemsIterator;
+	}
+}*/
 void EliseTabs::addTab()
 {
 	QObject* obj = view->rootObject()->findChild<QObject*>("tabs");
+	assert(obj!=NULL);
 
-	QQmlComponent* newItem = new QQmlComponent(view->engine(), "qml/TabItem.qml", obj);
+	QQmlComponent* newComp = new QQmlComponent(view->engine(), "qml/TabItem.qml");
+	QObject* myObject = newComp->create();
+	QQuickItem* item = qobject_cast<QQuickItem*>(myObject);
+	item->setParentItem(qobject_cast<QQuickItem*>(obj));
+
+	delete newComp;
 }
 
 /*void EliseTabs::minimize()
