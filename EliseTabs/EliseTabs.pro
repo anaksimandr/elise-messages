@@ -55,3 +55,9 @@ OTHER_FILES += \
     res/qml/MainViewBorder.qml \
 	res/qml/MainView.qml \
 	res/qml/TabWidget.qml
+
+OTHER_FILES += \
+    res/qml/TabbedUI.qml
+
+OTHER_FILES += \
+    res/qml/Tab.qml
