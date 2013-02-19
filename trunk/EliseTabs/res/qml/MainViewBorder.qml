@@ -32,6 +32,7 @@ Rectangle {
     }
 
     MainView {
+        id: tabs
         anchors {
             fill: parent;
             margins: 5;
@@ -86,7 +87,8 @@ Rectangle {
             rightMargin: 0;
         }
         label: "test"
-        onButtonClick: _window.addTab();
+        //onButtonClick: _window.addTab();
+        onButtonClick: tabs.createTabObject()
     }
 
 }

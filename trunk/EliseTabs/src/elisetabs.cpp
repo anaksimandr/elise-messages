@@ -78,15 +78,15 @@ void EliseTabs::close()
 }*/
 void EliseTabs::addTab()
 {
-	QObject* obj = view->rootObject()->findChild<QObject*>("tabs");
+	/*QObject* obj = view->rootObject()->findChild<QObject*>("tabs");
 	assert(obj!=NULL);
 
-	QQmlComponent* newComp = new QQmlComponent(view->engine(), "qml/TabItem.qml");
-	QObject* myObject = newComp->create();
+	QQmlComponent* newComp = new QQmlComponent(view->engine(), "qml/TabItem.qml", obj);
+	QObject* myObject = newComp->create(view->engine()->rootContext());
 	QQuickItem* item = qobject_cast<QQuickItem*>(myObject);
 	item->setParentItem(qobject_cast<QQuickItem*>(obj));
 
-	delete newComp;
+	delete newComp;*/
 }
 
 /*void EliseTabs::minimize()
