@@ -1,123 +1,75 @@
 import QtQuick 2.0
 
-Rectangle {
-    // height of the tab bar
-    property int tabsHeight : 64
+Item {
+    id: tabWidget
 
-    // index of the active tab
-    property int tabIndex : 0
+    // Setting the default property to stack.children means any child items
+    // of the TabWidget are actually added to the 'stack' item's children.
+    // See the "Property Binding"
+    // documentation for details on default properties.
+    default property alias content: stack.children
 
-    // the model used to build the tabs
-    property VisualItemModel tabsModel
+    property int current: 0
 
-    anchors.fill: parent
+    onCurrentChanged: setOpacities()
+    Component.onCompleted: setOpacities()
 
-    // will contain the tab views
-    Rectangle {
-        id: tabViewContainer
-        width: parent.width
+    function setOpacities() {
+        for (var i = 0; i < stack.children.length; ++i) {
+            stack.children[i].opacity = (i == current ? 1 : 0)
+        }
+    }
 
-        anchors.top: parent.top
-        anchors.bottom: tabBar.top
+    Row {
+        id: header
 
-        // build all the tab views
         Repeater {
-            model: tabsModel
-        }
-    }
+            model: stack.children.length
+            delegate: Rectangle {
+                width: tabWidget.width / stack.children.length;
+                height: 36
 
-    Component.onCompleted:
-    {
-        // hide all the tab views
-        for(var i = 0; i < tabsModel.children.length; i++)
-        {
-            tabsModel.children[i].visible = false;
-        }
-        // select the default tab index
-        tabClicked(tabIndex);
-    }
-
-    function tabClicked(index)
-    {
-        // unselect the currently selected tab
-        tabs.children[tabIndex].color = "transparent";
-
-        // hide the currently selected tab view
-        tabsModel.children[tabIndex].visible = false;
-
-        // change the current tab index
-        tabIndex = index;
-
-        // highlight the new tab
-        tabs.children[tabIndex].color = "#30ffffff";
-
-        // show the new tab view
-        tabsModel.children[tabIndex].visible = true;
-    }
-
-    Component {
-        id: tabBarItem
-
-        Rectangle {
-            height: tabs.height
-            width: tabs.width / tabsModel.count
-
-            color: "transparent"
-
-            Image {
-                source: tabsModel.children[index].icon
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 4
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 4
-                color: "white"
-                text: tabsModel.children[index].name
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    tabClicked(index);
+                Rectangle {
+                    width: parent.width; height: 1
+                    anchors { bottom: parent.bottom; bottomMargin: 1 }
+                    color: "#acb2c2"
+                }
+                BorderImage {
+                    anchors { fill: parent; leftMargin: 2; topMargin: 5; rightMargin: 1 }
+                    border { left: 7; right: 7 }
+                    //source: "tab.png"
+                    visible: tabWidget.current == index
+                }
+                Text {
+                    horizontalAlignment: Qt.AlignHCenter; verticalAlignment: Qt.AlignVCenter
+                    anchors.fill: parent
+                    text: stack.children[index].title
+                    elide: Text.ElideRight
+                    font.bold: tabWidget.current == index
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: tabWidget.current = index
                 }
             }
         }
     }
 
-    // the tab bar
-    Rectangle {
-        height: tabsHeight
-        width: parent.width
+    Item {
+        id: stack
+        width: tabWidget.width
+        anchors.top: header.bottom;
+        anchors.bottom: tabWidget.bottom
+    }
 
-        // take the whole parent width
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        // attach it to the view bottom
-        anchors.bottom: parent.bottom
-
-        id: tabBar
-
-        gradient: Gradient {
-            GradientStop {position: 0.0; color: "#666666"}
-            GradientStop {position: 1.0; color: "#000000"}
-        }
-
-        // place all the tabs in a row
-        Row {
-            anchors.fill: parent
-
-            id: tabs
-
-            Repeater {
-                model: tabsModel.count
-
-                delegate: tabBarItem
-            }
+    function createTabObject() {
+        var component;
+        var sprite;
+        component = Qt.createComponent("Tab.qml");
+        sprite = component.createObject(stack, { "title": "test" });
+        if (sprite === null) {
+            // Error Handling
+            console.log("Error creating object");
         }
     }
 }
