@@ -1,11 +1,19 @@
 import QtQuick 2.0
 
 Rectangle {
-    // name of the tab
-    property string name
-
-    // icon to be displayed in the tab
-    property string icon
-
+    property string title: "Red"
     anchors.fill: parent
+    color: "#e3e3e3"
+
+    Rectangle {
+        anchors.fill: parent; //anchors.margins: 20
+        color: "#ff7f7f"
+        Text {
+            width: parent.width - 20
+            anchors.centerIn: parent; horizontalAlignment: Qt.AlignHCenter
+            text: "Roses are red"
+            font.pixelSize: 20
+            wrapMode: Text.WordWrap
+        }
+    }
 }
