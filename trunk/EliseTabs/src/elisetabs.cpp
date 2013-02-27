@@ -1,4 +1,4 @@
-//#include <QApplication>
+#include <QApplication>
 #include <QGuiApplication>
 //#include <QDesktopWidget>
 #include <QScreen>
@@ -8,11 +8,15 @@
 #include <QtQuick/QtQuick>
 #include "elisetabs.h"
 #include <assert.h>
+#include "proxytextedit.h"
 
 EliseTabs::EliseTabs()
 {
+	qmlRegisterType<ProxyTextEdit>("ProxyWidgets", 1, 0, "ProxyTextEdit");
+	//qmlRegisterType<QTextEdit>("ProxyWidgets", 1, 0, "ProxyTextEdit1");
 	//QApplication app();
 	view = new QQuickView();
+
 	//view->connect(view->engine(), &QQmlEngine::quit, QApplication::quit);
 	view->connect(view->engine(), &QQmlEngine::quit, QGuiApplication::quit);
 	currentShape = -1;
@@ -39,8 +43,8 @@ EliseTabs::EliseTabs()
 	view->setResizeMode(QQuickView::SizeRootObjectToView);
 	//view->setResizeMode(QQuickView::SizeViewToRootObject);
 
-	//view->resize(750, 550);
-	view->resize(200, 150);
+	view->resize(750, 550);
+	//view->resize(200, 150);
 	//QRect d = QApplication::desktop()->screenGeometry();
 	QRect d = QGuiApplication::primaryScreen()->geometry();
 	view->setX(d.width() / 2 - view->width() / 2);
@@ -60,7 +64,8 @@ EliseTabs::~EliseTabs()
 
 void EliseTabs::close()
 {
-	QGuiApplication::exit();
+	//QGuiApplication::exit();
+	QApplication::exit();
 }
 
 /*QQuickItem* findChild(QQuickItem* parent)

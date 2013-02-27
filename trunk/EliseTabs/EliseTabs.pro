@@ -18,11 +18,13 @@ DEFINES += UNICODE
 RESOURCES +=
 
 HEADERS += \
-	src/elisetabs.h
+	src/elisetabs.h \
+    src/proxytextedit.h
 
 SOURCES += \
 	src/main.cpp \
-	src/elisetabs.cpp
+	src/elisetabs.cpp \
+    src/proxytextedit.cpp
 
 CONFIG (debug, debug|release) {
 	DESTDIR = ../Plugins/EliseTabs/Debug
@@ -54,10 +56,4 @@ OTHER_FILES += \
 	res/qml/border/Button.qml \
     res/qml/MainViewBorder.qml \
 	res/qml/MainView.qml \
-	res/qml/TabWidget.qml
-
-OTHER_FILES += \
-    res/qml/TabbedUI.qml
-
-OTHER_FILES += \
-    res/qml/Tab.qml
+	res/qml/Tab.qml

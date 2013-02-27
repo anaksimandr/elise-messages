@@ -1,4 +1,4 @@
-//#include <QApplication>
+#include <QApplication>
 #include <QGuiApplication>
 #include "elisetabs.h"
 
@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 #endif //NDEBUG*/
 	//QApplication app(argc, argv);
 	//app.setQuitOnLastWindowClosed(true);
-	QGuiApplication app(argc, argv);
+	//QGuiApplication app(argc, argv);
+	QApplication app(argc, argv);
 
 
 	new EliseTabs();
