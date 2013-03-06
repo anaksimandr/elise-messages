@@ -1,4 +1,4 @@
-QT  += qml quick widgets
+QT  += widgets qml quick
 TARGET  = EliseTabs
 TEMPLATE	= app
 #TEMPLATE    = lib

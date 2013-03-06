@@ -38,27 +38,46 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets/QApplication>
-#include <QtQml>
-#include <QtQuick/QQuickView>
+import QtDesktop 1.0
 
+ApplicationWindow {
+    width: 640
+    height: 480
+    minimumWidth: 400
+    minimumHeight: 300
 
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
-    QQmlEngine engine;
-    QQmlComponent component(&engine);
-    component.loadUrl(QUrl("qrc:/qml/main.qml"));
-    if ( !component.isReady() ) {
-        qWarning("%s", qPrintable(component.errorString()));
-        return -1;
+    menuBar: MenuBar {
+        Menu {
+            text: "Menu 1"
+            MenuItem { text: "Item 1" }
+            MenuItem { text: "Item 2" }
+        }
+        Menu {
+            text: "Menu 2"
+            MenuItem { text: "Item 3" }
+        }
     }
-    QObject *topLevel = component.create();
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(topLevel);
-    if ( !window ) {
-        qWarning("Error: Your root item has to be a Window.");
-        return -1;
+
+    toolBar: ToolBar {
+        RowLayout {
+            ToolButton { iconSource: "qrc:images/qt_icon.png" }
+            ToolButton { iconSource: "qrc:images/qt_icon.png" }
+        }
     }
-    window->show();
-    return app.exec();
+
+    SplitterRow {
+        anchors.fill: parent
+        handleWidth: 1
+        TableView {
+            frame: false
+            highlightOnFocus: false
+            model: 40
+            TableColumn { title: "Left Column" }
+        }
+        TextArea {
+            frame: false
+            highlightOnFocus: false
+            text: "Hello World"
+        }
+    }
 }
