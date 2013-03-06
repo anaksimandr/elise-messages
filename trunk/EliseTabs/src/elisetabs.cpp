@@ -8,11 +8,10 @@
 #include <QtQuick/QtQuick>
 #include "elisetabs.h"
 #include <assert.h>
-#include "proxytextedit.h"
 
 EliseTabs::EliseTabs()
 {
-	qmlRegisterType<ProxyTextEdit>("ProxyWidgets", 1, 0, "ProxyTextEdit");
+	//qmlRegisterType<ProxyTextEdit>("ProxyWidgets", 1, 0, "ProxyTextEdit");
 	//qmlRegisterType<QTextEdit>("ProxyWidgets", 1, 0, "ProxyTextEdit1");
 	//QApplication app();
 	view = new QQuickView();

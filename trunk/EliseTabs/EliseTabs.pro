@@ -18,13 +18,11 @@ DEFINES += UNICODE
 RESOURCES +=
 
 HEADERS += \
-	src/elisetabs.h \
-    src/proxytextedit.h
+	src/elisetabs.h
 
 SOURCES += \
 	src/main.cpp \
-	src/elisetabs.cpp \
-    src/proxytextedit.cpp
+	src/elisetabs.cpp
 
 CONFIG (debug, debug|release) {
 	DESTDIR = ../Plugins/EliseTabs/Debug
