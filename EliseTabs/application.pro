@@ -3,10 +3,12 @@ CONFIG += console
 TARGET = application
 
 SOURCES += \
-    main.cpp
+	src/main.cpp
 
 OTHER_FILES += \
-    qml/main.qml
+	res/qml/main.qml \
+	res/qml/*.qml \
+	res/qml/border/*.qml
 
 RESOURCES += \
     resources.qrc
